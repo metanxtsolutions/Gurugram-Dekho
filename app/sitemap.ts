@@ -1,100 +1,66 @@
 import { MetadataRoute } from 'next';
 import prisma from '@/lib/db';
 
+const baseUrl = 'https://gurugramdekho.com';
+
+type Row = { slug: string; updatedAt: Date };
+
+const STATIC_PAGES = [
+  { url: baseUrl, changeFrequency: 'daily', priority: 1.0 },
+  { url: `${baseUrl}/about`, changeFrequency: 'monthly', priority: 0.8 },
+  { url: `${baseUrl}/contact`, changeFrequency: 'monthly', priority: 0.7 },
+  { url: `${baseUrl}/privacy-policy`, changeFrequency: 'yearly', priority: 0.5 },
+  { url: `${baseUrl}/terms`, changeFrequency: 'yearly', priority: 0.5 },
+] as const satisfies readonly { url: string; changeFrequency: 'daily' | 'monthly' | 'yearly'; priority: number }[];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://gurugramdekho.com';
+  let articles: Row[] = [];
+  let categories: Row[] = [];
+  let areas: Row[] = [];
+  let places: Row[] = [];
 
-  // Static pages
-  const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/privacy-policy`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/terms`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.5,
-    },
-  ];
+  /*
+   * This route is statically generated, so an unreachable database at build
+   * time would fail the entire deploy. Degrade to the static routes instead:
+   * a sitemap missing its dynamic entries recovers on the next revalidation,
+   * a failed build does not.
+   */
+  try {
+    [articles, categories, areas, places] = await Promise.all([
+      prisma.article.findMany({
+        where: { status: 'published', isActive: true },
+        select: { slug: true, updatedAt: true },
+      }),
+      prisma.category.findMany({
+        where: { isActive: true },
+        select: { slug: true, updatedAt: true },
+      }),
+      prisma.area.findMany({
+        where: { isActive: true },
+        select: { slug: true, updatedAt: true },
+      }),
+      prisma.place.findMany({
+        where: { status: 'published', isActive: true },
+        select: { slug: true, updatedAt: true },
+      }),
+    ]);
+  } catch (error) {
+    console.error('sitemap: database unreachable, emitting static routes only:', error);
+  }
 
-  // Articles
-  const articles = await prisma.article.findMany({
-    where: { status: 'published' },
-    select: { slug: true, updatedAt: true },
-  });
-
-  const articlePages: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${baseUrl}/article/${article.slug}`,
-    lastModified: article.updatedAt,
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }));
-
-  // Categories
-  const categories = await prisma.category.findMany({
-    where: { isActive: true, parentId: null },
-    select: { slug: true, updatedAt: true },
-  });
-
-  const categoryPages: MetadataRoute.Sitemap = categories.map((category) => ({
-    url: `${baseUrl}/category/${category.slug}`,
-    lastModified: category.updatedAt || new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.9,
-  }));
-
-  // Areas
-  const areas = await prisma.area.findMany({
-    where: { isActive: true },
-    select: { slug: true, updatedAt: true },
-  });
-
-  const areaPages: MetadataRoute.Sitemap = areas.map((area) => ({
-    url: `${baseUrl}/area/${area.slug}`,
-    lastModified: area.updatedAt || new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }));
-
-  // Places
-  const places = await prisma.place.findMany({
-    where: { status: 'published' },
-    select: { slug: true, updatedAt: true },
-  });
-
-  const placePages: MetadataRoute.Sitemap = places.map((place) => ({
-    url: `${baseUrl}/place/${place.slug}`,
-    lastModified: place.updatedAt,
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }));
+  const entries = (rows: Row[], prefix: string, priority: number, freq: 'weekly' | 'monthly') =>
+    rows.map((r) => ({
+      url: `${baseUrl}/${prefix}/${r.slug}`,
+      lastModified: r.updatedAt,
+      changeFrequency: freq,
+      priority,
+    })) as MetadataRoute.Sitemap;
 
   return [
-    ...staticPages,
-    ...articlePages,
-    ...categoryPages,
-    ...areaPages,
-    ...placePages,
+    ...STATIC_PAGES.map((p) => ({ ...p, lastModified: new Date() })),
+    ...entries(articles, 'article', 0.9, 'weekly'),
+    ...entries(categories, 'category', 0.8, 'weekly'),
+    ...entries(areas, 'area', 0.8, 'weekly'),
+    ...entries(places, 'place', 0.7, 'monthly'),
   ];
 }
