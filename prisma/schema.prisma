@@ -1,0 +1,422 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("contributor")
+  avatar    String?
+  bio       String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles Article[]
+  places   Place[]
+  settings Setting[]
+  verifiedImages Image[]
+  reviewedSubmissions PhotoSubmission[]
+
+  @@index([email])
+}
+
+model Article {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  excerpt        String?
+  content        String?
+  featuredImageId  String?
+  featuredImage    Image?    @relation("ArticleFeaturedImage", fields: [featuredImageId], references: [id], onDelete: SetNull)
+  status         String   @default("draft")
+  authorId       String
+  author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  viewCount      Int      @default(0)
+  featured       Boolean  @default(false)
+  readMins       Int?
+  isActive       Boolean  @default(true)
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+  canonicalUrl   String?
+  publishedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  categories ArticleCategory[]
+  tags       ArticleTag[]
+  images     ArticleImage[]
+  areas      ArticleArea[]
+
+  @@index([slug])
+  @@index([authorId])
+  @@index([status, publishedAt])
+  @@index([status, featured])
+  @@index([featuredImageId])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  icon        String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  parentId    String?
+  parent      Category? @relation("CategoryParent", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Category[] @relation("CategoryParent")
+  articles    ArticleCategory[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  seoTitle    String?
+  seoDescription String?
+  seoKeywords String?
+
+  @@index([slug])
+}
+
+model ArticleCategory {
+  id         String   @id @default(cuid())
+  articleId  String
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([articleId, categoryId])
+}
+
+/// Explicit many-to-many between guides and the areas they cover. Replaces a
+/// `contains` match on article text, which could not express coverage that the
+/// prose never names and misfired on short or ambiguous area names.
+model ArticleArea {
+  id        String   @id @default(cuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  areaId    String
+  area      Area     @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([articleId, areaId])
+  @@index([articleId])
+  @@index([areaId])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  articles ArticleTag[]
+
+  @@index([slug])
+}
+
+model ArticleTag {
+  id        String   @id @default(cuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([articleId, tagId])
+}
+
+model Place {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  description    String?
+  placeType      String
+  areaId         String
+  area           Area     @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  address        String?
+  latitude       Float?
+  longitude      Float?
+  phone          String?
+  website        String?
+  email          String?
+  /// Legacy free-text hours. Superseded by openingHours; kept for display
+  /// only where a place has no structured rows yet.
+  hours          String?
+  openingHours   OpeningHour[]
+  /// Set for places that never close, which have no interval rows.
+  alwaysOpen     Boolean  @default(false)
+  cuisine        String?
+  specialties    String?
+  priceRange     String   @default("₹₹")
+  rating         Float    @default(0)
+  featured       Boolean  @default(false)
+  status         String   @default("draft")
+  editorId       String?
+  editor         User?    @relation(fields: [editorId], references: [id], onDelete: SetNull)
+  image          Image?   @relation(fields: [imageId], references: [id])
+  imageId        String?
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+  isActive       Boolean  @default(true)
+  submissions    PhotoSubmission[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([slug])
+  @@index([areaId])
+}
+
+/// One opening interval. A day with no row is closed; a day may have two rows
+/// for a lunch/dinner split. `closesAt` may exceed 1440 to express closing
+/// after midnight — 1am is 1500, which keeps every comparison a plain integer
+/// and avoids date arithmetic at query time.
+model OpeningHour {
+  id       String @id @default(cuid())
+  placeId  String
+  place    Place  @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  /// 0 = Sunday … 6 = Saturday, matching Date#getDay.
+  day      Int
+  /// Minutes from midnight.
+  opensAt  Int
+  closesAt Int
+
+  @@index([placeId])
+  @@index([placeId, day])
+}
+
+model Area {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  tagline     String?
+  type        String   @default("area")
+  imageId     String?
+  image       Image?   @relation(fields: [imageId], references: [id])
+  latitude    Float?
+  longitude   Float?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  parentId    String?
+  parent      Area?    @relation("AreaParent", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Area[]   @relation("AreaParent")
+  places      Place[]
+  articles    ArticleArea[]
+  submissions PhotoSubmission[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  seoTitle    String?
+  seoDescription String?
+  seoKeywords String?
+
+  @@index([slug])
+}
+
+/// Every image carries its provenance. Two rules are enforced on top of this:
+///  - only `approved` images may be attached to published content;
+///  - `depicts` must be "exact" for a Place or Area image, because those make a
+///    factual claim ("this is that place"). Illustrative stock may only head an
+///    article, never stand in for a specific venue.
+model Image {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  caption   String?
+  width     Int?
+  height    Int?
+
+  /// business | community | openly_licensed | official | stock | own
+  source         String    @default("stock")
+  /// permission | cc0 | cc_by | cc_by_sa | godl | unsplash | proprietary | unknown
+  license        String    @default("unknown")
+  /// Rendered publicly when the licence requires it, e.g. "Photo: Ravi Kumar".
+  credit         String?
+  /// Where the file came from — the Commons page, the business, the email.
+  sourceUrl      String?
+  licenseUrl     String?
+  /// Evidence of permission: who granted it, when, over which channel.
+  permissionNote String?
+  /// exact | illustrative
+  depicts        String    @default("illustrative")
+  /// draft | approved | rejected
+  status         String    @default("draft")
+  /// Set when an editor confirms the provenance above is true.
+  verifiedAt     DateTime?
+  verifiedById   String?
+  verifiedBy     User?     @relation(fields: [verifiedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+
+  articles    ArticleImage[]
+  places      Place[]
+  submissions PhotoSubmission[]
+  areas       Area[]
+  featuredFor Article[]     @relation("ArticleFeaturedImage")
+
+  @@index([url])
+  @@index([status])
+  @@index([source])
+}
+
+model ArticleImage {
+  id        String   @id @default(cuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  imageId   String
+  image     Image    @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@unique([articleId, imageId])
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  location    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([slug])
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([slug])
+}
+
+model NavigationMenu {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  items NavigationMenuItem[]
+
+  @@index([slug])
+}
+
+model NavigationMenuItem {
+  id       String  @id @default(cuid())
+  label    String
+  url      String
+  order    Int     @default(0)
+  menuId   String
+  menu     NavigationMenu @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  parentId String?
+  parent   NavigationMenuItem? @relation("MenuItemParent", fields: [parentId], references: [id], onDelete: Cascade)
+  children NavigationMenuItem[] @relation("MenuItemParent")
+
+  @@index([menuId])
+}
+
+/// Key/value site configuration edited from the admin panel. Values are read
+/// by the root layout for metadata, so a change here affects every page.
+model Setting {
+  key         String   @id
+  value       String
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   User?    @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+/// A photo sent in by a reader. Nothing here is public until an editor
+/// approves it and an Image row is created from it.
+///
+/// `licenseGrant` stores the exact wording the submitter agreed to, alongside
+/// when they agreed. That text is the permission — paraphrasing it later would
+/// leave no record of what was actually granted.
+model PhotoSubmission {
+  id String @id @default(cuid())
+
+  /// What the photo is of. Exactly one of these is set.
+  placeId String?
+  place   Place?  @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  areaId  String?
+  area    Area?   @relation(fields: [areaId], references: [id], onDelete: Cascade)
+
+  /// Stored file — key is the storage-driver path, url is how it is served.
+  storageKey String
+  url        String
+  width      Int?
+  height     Int?
+  bytes      Int
+
+  submitterName  String
+  submitterEmail String
+  note           String?
+
+  licenseGrant String
+  grantedAt    DateTime @default(now())
+
+  /// pending | approved | rejected
+  status          String    @default("pending")
+  reviewedAt      DateTime?
+  reviewedById    String?
+  reviewedBy      User?     @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+  rejectionReason String?
+
+  /// Set once approved and promoted into the image library.
+  imageId String?
+  image   Image?  @relation(fields: [imageId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([placeId])
+  @@index([areaId])
+}
+
+/// Shared counter for the public endpoints.
+///
+/// Lives in the database rather than in process memory because serverless
+/// instances do not share a heap — an in-process Map gives each instance its
+/// own allowance, so the effective limit is (instances x limit).
+model RateLimit {
+  key     String   @id
+  count   Int      @default(0)
+  resetAt DateTime
+
+  @@index([resetAt])
+}
+
+model Analytics {
+  id        String   @id @default(cuid())
+  page      String
+  event     String?
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  @@index([page])
+}
+
+model SearchLog {
+  id        String   @id @default(cuid())
+  query     String
+  category  String?
+  results   Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([query])
+}

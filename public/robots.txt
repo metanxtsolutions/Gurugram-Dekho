@@ -1,0 +1,17 @@
+# Robots.txt for Gurugram Dekho
+# Allow all bots to crawl and index the site
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+Disallow: /auth
+Disallow: /*.json$
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+
+# Sitemap
+Sitemap: https://gurugramdekho.com/sitemap.xml
+
+# Crawl delay (optional - remove if not needed)
+# Crawl-delay: 1
