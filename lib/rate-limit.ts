@@ -11,7 +11,7 @@ import prisma from '@/lib/db';
  * instance already shares.
  *
  * The window is fixed rather than sliding. A caller can therefore burst up to
- * 2x the limit across a window boundary — five at 12:59 and five at 13:01.
+ * 2x the limit across a window boundary, five at 12:59 and five at 13:01.
  * That is the standard trade for a single-statement check, and it is well
  * within tolerance for an abuse control on photo uploads. A sliding window
  * would need a row per hit and a periodic prune.
@@ -66,7 +66,7 @@ export async function rateLimit(
   } catch (error) {
     /*
      * Fail open. Every endpoint behind this limiter writes to the same
-     * database moments later, so a genuine outage stops the request anyway —
+     * database moments later, so a genuine outage stops the request anyway -
      * refusing here would only turn a clear error into a misleading 429.
      */
     console.error('rateLimit check failed, allowing request:', error);
@@ -86,8 +86,8 @@ export function clientKey(request: Request, scope: string) {
 }
 
 /**
- * Drops rows whose window has closed. Nothing depends on this running — an
- * expired row is reused in place — it only stops the table growing with
+ * Drops rows whose window has closed. Nothing depends on this running, an
+ * expired row is reused in place, it only stops the table growing with
  * one-off visitors. Safe to call from a cron or occasionally inline.
  */
 export async function pruneRateLimits() {

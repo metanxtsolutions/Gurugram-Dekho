@@ -4,7 +4,7 @@
  * They are Unsplash files: legally fine to use, but none of them are
  * photographs of Gurugram. They are therefore marked `illustrative`, which
  * makes every place and area currently using one show up in the replacement
- * queue — those slots make a factual claim these photos cannot support.
+ * queue, those slots make a factual claim these photos cannot support.
  *
  *   npx dotenv -e .env -- npx tsx prisma/backfill-image-provenance.ts
  */
@@ -34,7 +34,7 @@ async function main() {
             // Usable, but flagged for replacement wherever it claims a place.
             status: 'approved',
             permissionNote:
-              'Unsplash License — free for commercial use, no attribution required. Not a photograph of the subject; replace with an authentic image.',
+              'Unsplash License, free for commercial use, no attribution required. Not a photograph of the subject; replace with an authentic image.',
           }
         : { source: 'stock', license: 'unknown', status: 'draft' },
     });

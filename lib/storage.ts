@@ -9,9 +9,9 @@ import { put, del } from '@vercel/blob';
  *
  * Two drivers, selected by whether a blob token is configured:
  *
- *  - `blob`  — Vercel Blob. Required on Vercel, whose filesystem is read-only
+ *  - `blob`: Vercel Blob. Required on Vercel, whose filesystem is read-only
  *              at runtime. Chosen whenever BLOB_READ_WRITE_TOKEN is present.
- *  - `local` — writes into `public/uploads`. Fine for development and for a
+ *  - `local`, writes into `public/uploads`. Fine for development and for a
  *              self-hosted server with a persistent disk.
  *
  * Running on Vercel without a token fails loudly at the call site rather than

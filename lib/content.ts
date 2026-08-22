@@ -76,7 +76,7 @@ export const FEATURED: Story[] = [
     title: "Moving to Gurugram? Read This Before You Sign a Lease",
     slug: "moving-to-gurugram-rental-guide",
     excerpt:
-      "Deposits, brokerage, water supply, power backup — the questions that matter.",
+      "Deposits, brokerage, water supply, power backup. The questions that matter.",
     category: "Stays & Living",
     categorySlug: "stays-accommodation",
     image: u("photo-1560448204-e02f11c3d0e2", 900),
@@ -124,7 +124,7 @@ export const LATEST: Story[] = [
   {
     title: "Where Gurugram Actually Shops on a Saturday",
     slug: "gurugram-saturday-shopping-guide",
-    excerpt: "Beyond the three big malls — markets, thrift, and factory outlets.",
+    excerpt: "Beyond the three big malls: markets, thrift, and factory outlets.",
     category: "Shopping",
     categorySlug: "shopping",
     image: u("photo-1441986300917-64674bd600d8", 800),

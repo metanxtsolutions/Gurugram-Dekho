@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
  *
  * The homepage is statically rendered with `revalidate = 300` and the sitemap
  * is fully static, so both need an explicit purge whenever published content
- * changes — otherwise an edit can take up to five minutes to appear.
+ * changes, otherwise an edit can take up to five minutes to appear.
  *
  * Detail pages are rendered on demand, but they are still purged so their Data
  * Cache entry does not serve a stale payload.

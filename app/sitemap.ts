@@ -6,7 +6,7 @@ const baseUrl = 'https://gurugramdekho.com';
 /*
  * Regenerate hourly. Without this the sitemap is generated once at build and
  * never again, so anything published between deploys stays invisible to
- * crawlers — and a build that ran against an empty database would freeze a
+ * crawlers, and a build that ran against an empty database would freeze a
  * five-URL sitemap in place until someone happened to redeploy.
  */
 export const revalidate = 3600;

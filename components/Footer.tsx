@@ -42,7 +42,7 @@ const SOCIAL = [
 
 export function Footer({
   siteTitle = 'Gurugram Dekho',
-  description = 'An independent guide to Gurugram and Gurgaon — food, places, rentals and work, written by people who live here. No paid listings.',
+  description = 'An independent guide to Gurugram and Gurgaon. Food, places, rentals and work, written by people who live here. No paid listings.',
 }: {
   siteTitle?: string;
   description?: string;

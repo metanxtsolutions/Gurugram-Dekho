@@ -2,7 +2,7 @@ import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
 /**
- * CLI configuration — used by `prisma migrate` and `prisma db`, not by the
+ * CLI configuration, used by `prisma migrate` and `prisma db`, not by the
  * runtime client (that lives in lib/db.ts with its own driver adapter).
  *
  * Migrations need a DIRECT connection. Neon's DATABASE_URL points at its

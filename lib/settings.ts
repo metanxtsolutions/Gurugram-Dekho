@@ -16,9 +16,9 @@ export const SETTING_DEFAULTS = {
   siteTitle: 'Gurugram Dekho',
   siteTagline: 'Millennium City guide',
   siteDescription:
-    'An independent guide to Gurugram and Gurgaon — food, places, rentals and work, written by people who live here.',
+    'An independent guide to Gurugram and Gurgaon. Food, places, rentals and work, written by people who live here.',
   defaultMetaDescription:
-    'Discover Gurugram/Gurgaon — restaurants, cafés, places, events and local information.',
+    'Discover Gurugram/Gurgaon: restaurants, cafés, places, events and local information.',
   contactEmail: '',
   googleAnalyticsId: '',
   searchConsoleVerification: '',
@@ -30,7 +30,7 @@ export type Settings = Record<SettingKey, string>;
 export const SETTING_KEYS = Object.keys(SETTING_DEFAULTS) as SettingKey[];
 
 /**
- * Deduplicated per request — the layout and a page in the same render share
+ * Deduplicated per request, the layout and a page in the same render share
  * one query rather than issuing two.
  */
 export const getSettings = cache(async (): Promise<Settings> => {
@@ -48,13 +48,13 @@ export const getSettings = cache(async (): Promise<Settings> => {
       return acc;
     }, {} as Settings);
   } catch (error) {
-    // Settings must never take the site down — fall back to the defaults.
+    // Settings must never take the site down, fall back to the defaults.
     console.error('getSettings failed, using defaults:', error);
     return { ...SETTING_DEFAULTS };
   }
 });
 
-/** Values exactly as stored, with '' for unset — for the admin form. */
+/** Values exactly as stored, with '' for unset, for the admin form. */
 export async function getRawSettings(): Promise<Settings> {
   const rows = await prisma.setting.findMany({
     where: { key: { in: SETTING_KEYS } },

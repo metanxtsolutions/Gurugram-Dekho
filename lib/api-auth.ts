@@ -6,7 +6,7 @@ import { errorResponse } from '@/lib/utils';
 /**
  * Authorization for API route handlers.
  *
- * Read endpoints stay public — they serve the public site. Every mutation goes
+ * Read endpoints stay public, they serve the public site. Every mutation goes
  * through `requireRole`, which returns either the caller or a response to
  * return immediately:
  *

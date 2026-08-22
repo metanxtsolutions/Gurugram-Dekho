@@ -2,7 +2,7 @@
  * One-off backfill: derive ArticleArea rows from the text match the area page
  * used before the join table existed, so no existing association is lost.
  *
- * Idempotent — safe to re-run. Run with:
+ * Idempotent, safe to re-run. Run with:
  *   npx dotenv -e .env -- npx tsx prisma/backfill-article-areas.ts
  */
 import prisma from '../lib/db';

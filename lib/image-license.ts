@@ -19,7 +19,7 @@ export const SOURCES = {
   },
   openly_licensed: {
     label: 'Openly licensed (Commons etc.)',
-    hint: 'Check the licence on the file page — it varies per photo.',
+    hint: 'Check the licence on the file page, it varies per photo.',
     needsPermissionNote: false,
   },
   official: {
@@ -34,7 +34,7 @@ export const SOURCES = {
   },
   stock: {
     label: 'Generic stock',
-    hint: 'Illustrative only — must never stand in for a specific venue.',
+    hint: 'Illustrative only. Must never stand in for a specific venue.',
     needsPermissionNote: false,
   },
 } as const;

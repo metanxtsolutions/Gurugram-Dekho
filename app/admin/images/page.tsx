@@ -115,7 +115,7 @@ export default async function ImagesPage() {
                   value={
                     img.credit ?? (
                       <span className={missingCredit ? 'text-red-600 font-semibold' : 'text-gray-400'}>
-                        {missingCredit ? 'required — missing' : 'not required'}
+                        {missingCredit ? 'required, missing' : 'not required'}
                       </span>
                     )
                   }

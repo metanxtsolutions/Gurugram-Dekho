@@ -39,7 +39,7 @@ export default async function Home() {
               <span className="text-brand-400">Gurugram</span>.
             </h1>
             <p className="mt-6 text-lg md:text-xl text-ink-200 max-w-2xl leading-relaxed">
-              Honest guides to food, neighbourhoods, rentals and work — written
+              Honest guides to food, neighbourhoods, rentals and work, written
               by people who actually live here. No paid listings, no filler.
             </p>
 
@@ -72,7 +72,7 @@ export default async function Home() {
               </button>
             </form>
 
-            {/* Quick searches — a single scrolling rail rather than a wrapping
+            {/* Quick searches: a single scrolling rail rather than a wrapping
                 block, so the hero keeps a fixed height as terms are added. */}
             <div className="mt-5 flex items-center gap-3">
               <span className="shrink-0 text-sm text-ink-400">Popular:</span>
@@ -337,7 +337,7 @@ export default async function Home() {
             </h2>
             <p className="mt-4 text-ink-300">
               New openings, event picks and neighbourhood guides. Unsubscribe any
-              time — we don't sell your address.
+              time. We don't sell your address.
             </p>
             <form className="mt-8 flex flex-col sm:flex-row gap-3 max-w-lg">
               <input
@@ -365,7 +365,7 @@ export default async function Home() {
 
 /**
  * next/image throws on an empty src, and records created through the admin
- * panel may not have an image yet — fall back to a brand gradient.
+ * panel may not have an image yet, fall back to a brand gradient.
  */
 function CardImage({
   src,

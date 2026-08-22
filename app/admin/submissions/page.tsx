@@ -99,7 +99,7 @@ export default async function SubmissionsPage() {
             <tbody className="divide-y">
               {reviewed.map((s) => (
                 <tr key={s.id}>
-                  <td className="px-5 py-3">{s.place?.name ?? s.area?.name ?? '—'}</td>
+                  <td className="px-5 py-3">{s.place?.name ?? s.area?.name ?? '-'}</td>
                   <td className="px-5 py-3 text-gray-500">{s.submitterName}</td>
                   <td className="px-5 py-3">
                     <span
@@ -112,7 +112,7 @@ export default async function SubmissionsPage() {
                       {s.status}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-gray-500">{s.reviewedBy?.name ?? '—'}</td>
+                  <td className="px-5 py-3 text-gray-500">{s.reviewedBy?.name ?? '-'}</td>
                 </tr>
               ))}
             </tbody>

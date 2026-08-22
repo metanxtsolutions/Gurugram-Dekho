@@ -49,7 +49,7 @@ export async function processUpload(input: Buffer): Promise<ProcessResult> {
   try {
     meta = await sharp(input).metadata();
   } catch {
-    // Decoding failed — whatever this is, it is not an image.
+    // Decoding failed, whatever this is, it is not an image.
     return { ok: false, error: 'That file is not a readable image' };
   }
 
@@ -62,7 +62,7 @@ export async function processUpload(input: Buffer): Promise<ProcessResult> {
   if (meta.width < MIN_DIMENSION || meta.height < MIN_DIMENSION) {
     return {
       ok: false,
-      error: `Image is too small — at least ${MIN_DIMENSION}px on each side`,
+      error: `Image is too small. Use at least ${MIN_DIMENSION}px on each side`,
     };
   }
 

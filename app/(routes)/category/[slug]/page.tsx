@@ -104,7 +104,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
   const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
 
-  // A thin category still deserves a full page — offer the wider catalogue.
+  // A thin category still deserves a full page, offer the wider catalogue.
   const elsewhere =
     articles.length < 4
       ? await prisma.article.findMany({

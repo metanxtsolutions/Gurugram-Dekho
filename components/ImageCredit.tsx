@@ -1,7 +1,7 @@
 import { creditLine } from '@/lib/image-license';
 
 /**
- * Attribution line. CC BY, CC BY-SA and GODL all require a visible credit —
+ * Attribution line. CC BY, CC BY-SA and GODL all require a visible credit -
  * rendering it is a licence condition, not decoration.
  */
 export function ImageCredit({

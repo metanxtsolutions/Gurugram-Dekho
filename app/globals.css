@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand — vivid saffron/orange */
+  /* Brand, vivid saffron/orange */
   --color-brand-50: #fff5ed;
   --color-brand-100: #ffe8d5;
   --color-brand-200: #ffcdaa;
@@ -13,7 +13,7 @@
   --color-brand-800: #9e250e;
   --color-brand-900: #7f220f;
 
-  /* Ink — deep navy-black, the editorial base */
+  /* Ink, deep navy-black, the editorial base */
   --color-ink-50: #f4f6fb;
   --color-ink-100: #e7ebf4;
   --color-ink-200: #cbd3e4;
@@ -26,7 +26,7 @@
   --color-ink-900: #131b2e;
   --color-ink-950: #0b0f19;
 
-  /* Accent — teal, used sparingly for contrast */
+  /* Accent, teal, used sparingly for contrast */
   --color-accent-400: #2dd4bf;
   --color-accent-500: #14b8a6;
   --color-accent-600: #0d9488;

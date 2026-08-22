@@ -29,7 +29,7 @@ export function useFormErrors() {
     try {
       payload = await response.json();
     } catch {
-      // Non-JSON body (a proxy error page, say) — fall through to status text.
+      // Non-JSON body (a proxy error page, say), fall through to status text.
     }
 
     const fields = payload?.fields ?? {};
@@ -124,7 +124,7 @@ export function FormBanner({
       <p className="font-semibold">{message}</p>
       {count > 0 && (
         <p className="mt-1 text-sm text-red-700">
-          {count === 1 ? '1 field needs attention' : `${count} fields need attention`} — see the
+          {count === 1 ? '1 field needs attention' : `${count} fields need attention`}, see the
           highlighted inputs below.
         </p>
       )}

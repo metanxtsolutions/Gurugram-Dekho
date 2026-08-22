@@ -22,7 +22,7 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
-  // Authors belong here — they can write and manage their own articles.
+  // Authors belong here, they can write and manage their own articles.
   // Contributors have no write permission anywhere, so they are sent away.
   const user = await requirePageRole(STAFF);
 

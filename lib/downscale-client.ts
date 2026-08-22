@@ -6,7 +6,7 @@
  * Phone photos routinely exceed the request-body limit of a serverless
  * function, so without this a perfectly good submission fails at the platform
  * edge with nothing useful to show the user. Re-encoding through a canvas also
- * drops EXIF — but the server strips it again with sharp, because nothing the
+ * drops EXIF, but the server strips it again with sharp, because nothing the
  * client claims about a file can be trusted.
  */
 
@@ -21,7 +21,7 @@ export async function downscaleImage(file: File): Promise<File> {
   try {
     bitmap = await createImageBitmap(file);
   } catch {
-    // Not decodable here — let the server produce the real error message.
+    // Not decodable here, let the server produce the real error message.
     return file;
   }
 

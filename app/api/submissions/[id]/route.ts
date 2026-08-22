@@ -43,7 +43,7 @@ export async function PATCH(request: NextRequest, context: Context) {
     }
 
     if (action === 'reject') {
-      // The file is of no further use — remove it rather than keeping a
+      // The file is of no further use, remove it rather than keeping a
       // stranger's photo on disk indefinitely.
       await removeStoredFile(submission.storageKey);
 
@@ -62,7 +62,7 @@ export async function PATCH(request: NextRequest, context: Context) {
 
     const subjectName = submission.place?.name ?? submission.area?.name ?? 'Gurugram';
 
-    // A reader photo of a specific place genuinely depicts it — that is the
+    // A reader photo of a specific place genuinely depicts it, that is the
     // whole point of collecting them.
     const image = await prisma.image.create({
       data: {

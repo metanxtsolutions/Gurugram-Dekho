@@ -57,7 +57,7 @@ export function Header({
 
   return (
     <>
-      {/* Thin utility strip — gives the header weight and a place for areas */}
+      {/* Thin utility strip: gives the header weight and a place for areas */}
       <div className="hidden lg:block bg-ink-950 text-ink-300 text-[13px]">
         <div className="mx-auto max-w-7xl px-6 h-9 flex items-center justify-between">
           <p className="flex items-center gap-2">

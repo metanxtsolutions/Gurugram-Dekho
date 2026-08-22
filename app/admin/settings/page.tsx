@@ -190,7 +190,7 @@ export default function SettingsPage() {
             />
           </Field>
           <p className="-mt-2 text-xs text-gray-500">
-            {values.defaultMetaDescription.length}/320 — around 155 shows in search results.
+            {values.defaultMetaDescription.length}/320. Around 155 shows in search results.
           </p>
           <FieldError name="defaultMetaDescription" errors={fieldErrors} />
 

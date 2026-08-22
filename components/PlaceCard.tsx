@@ -16,7 +16,7 @@ interface PlaceCardProps {
   reviewCount?: number;
   priceRange?: string;
   cuisine?: string;
-  /** Shown inline — knowing it is open is the point of a listing card. */
+  /** Shown inline, knowing it is open is the point of a listing card. */
   openState?: OpenState;
 }
 

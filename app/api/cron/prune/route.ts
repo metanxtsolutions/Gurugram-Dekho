@@ -6,7 +6,7 @@ import { errorResponse } from '@/lib/utils';
  * Housekeeping, called on a schedule.
  *
  * Rate-limit rows are reused in place once their window closes, so nothing
- * breaks without this — it only stops the table accumulating a row per
+ * breaks without this, it only stops the table accumulating a row per
  * one-off visitor.
  *
  * Authorised with CRON_SECRET. Vercel Cron sends it as a bearer token; any

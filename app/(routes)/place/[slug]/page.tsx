@@ -151,7 +151,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
         </div>
       </div>
 
-      {/* Fact strip — the answers people came for, above the fold. */}
+      {/* Fact strip, the answers people came for, above the fold. */}
       <div className="border-b border-ink-100 bg-white">
         <div className="mx-auto max-w-6xl px-5 sm:px-6 py-4">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3">

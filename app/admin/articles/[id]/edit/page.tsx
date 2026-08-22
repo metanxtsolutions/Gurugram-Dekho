@@ -117,7 +117,7 @@ export default function EditArticlePage() {
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-amber-900">
           <p className="font-semibold">This article belongs to another author.</p>
           <p className="mt-1 text-sm">
-            Ask an editor if it needs changing — you can only edit your own articles.
+            Ask an editor if it needs changing. You can only edit your own articles.
           </p>
         </div>
         <button
@@ -229,7 +229,7 @@ export default function EditArticlePage() {
         <div className="border-t pt-6">
           <h3 className="font-semibold mb-1">Areas covered</h3>
           <p className="text-sm text-gray-500 mb-4">
-            Tag every area this guide covers — it decides which area pages list it.
+            Tag every area this guide covers. It decides which area pages list it.
           </p>
           <div className="flex flex-wrap gap-2">
             {areas.map((area) => {

@@ -169,7 +169,7 @@ export async function getHomepageData(): Promise<HomepageData> {
         prisma.article.count({ where: published }),
       ]);
 
-    // Nothing published yet — show the curated set rather than an empty page.
+    // Nothing published yet, show the curated set rather than an empty page.
     if (recentRows.length === 0 && categoryRows.length === 0) {
       return fallback();
     }

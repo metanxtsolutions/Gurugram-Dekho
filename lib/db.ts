@@ -2,7 +2,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
 /**
- * Prisma 7 requires an explicit driver adapter — the datasource `url` in
+ * Prisma 7 requires an explicit driver adapter, the datasource `url` in
  * schema.prisma is no longer read by the client at runtime.
  */
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };

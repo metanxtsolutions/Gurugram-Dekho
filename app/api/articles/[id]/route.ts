@@ -141,7 +141,7 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
       ).map((a) => a.slug);
     }
 
-    // Purge the article, its categories and areas — old and new, so a page it
+    // Purge the article, its categories and areas, old and new, so a page it
     // was removed from stops advertising it.
     const categorySlugs = article.categories.map((c) => c.category.slug);
     const previousSlugs = existing.categories.map((c) => c.category.slug);

@@ -2,7 +2,7 @@
  * Opening-hours logic.
  *
  * Everything is computed in Asia/Kolkata regardless of where the server runs,
- * because "open now" means open in Gurugram — a UTC server would otherwise
+ * because "open now" means open in Gurugram, a UTC server would otherwise
  * tell a reader in Sector 29 that a café closed five and a half hours ago.
  */
 

@@ -177,7 +177,7 @@ model Place {
 
 /// One opening interval. A day with no row is closed; a day may have two rows
 /// for a lunch/dinner split. `closesAt` may exceed 1440 to express closing
-/// after midnight — 1am is 1500, which keeps every comparison a plain integer
+/// after midnight: 1am is 1500, which keeps every comparison a plain integer
 /// and avoids date arithmetic at query time.
 model OpeningHour {
   id       String @id @default(cuid())
@@ -240,7 +240,7 @@ model Image {
   license        String    @default("unknown")
   /// Rendered publicly when the licence requires it, e.g. "Photo: Ravi Kumar".
   credit         String?
-  /// Where the file came from — the Commons page, the business, the email.
+  /// Where the file came from, the Commons page, the business, the email.
   sourceUrl      String?
   licenseUrl     String?
   /// Evidence of permission: who granted it, when, over which channel.
@@ -345,7 +345,7 @@ model Setting {
 /// approves it and an Image row is created from it.
 ///
 /// `licenseGrant` stores the exact wording the submitter agreed to, alongside
-/// when they agreed. That text is the permission — paraphrasing it later would
+/// when they agreed. That text is the permission, paraphrasing it later would
 /// leave no record of what was actually granted.
 model PhotoSubmission {
   id String @id @default(cuid())
@@ -356,7 +356,7 @@ model PhotoSubmission {
   areaId  String?
   area    Area?   @relation(fields: [areaId], references: [id], onDelete: Cascade)
 
-  /// Stored file — key is the storage-driver path, url is how it is served.
+  /// Stored file, key is the storage-driver path, url is how it is served.
   storageKey String
   url        String
   width      Int?
@@ -391,7 +391,7 @@ model PhotoSubmission {
 /// Shared counter for the public endpoints.
 ///
 /// Lives in the database rather than in process memory because serverless
-/// instances do not share a heap — an in-process Map gives each instance its
+/// instances do not share a heap, an in-process Map gives each instance its
 /// own allowance, so the effective limit is (instances x limit).
 model RateLimit {
   key     String   @id

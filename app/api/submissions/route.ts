@@ -8,8 +8,8 @@ import { getStorage } from '@/lib/storage';
 import { rateLimit, clientKey } from '@/lib/rate-limit';
 
 /**
- * Public photo submission. Unauthenticated by design — a reader should not
- * need an account to send in a photo — so everything lands as `pending` and
+ * Public photo submission. Unauthenticated by design, a reader should not
+ * need an account to send in a photo, so everything lands as `pending` and
  * nothing reaches the site until an editor approves it.
  */
 
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
         data: {
           id: submission.id,
           subject: subject.name,
-          message: 'Thank you — an editor will review your photo before it appears.',
+          message: 'Thank you. An editor will review your photo before it appears.',
         },
       },
       { status: 201 }
