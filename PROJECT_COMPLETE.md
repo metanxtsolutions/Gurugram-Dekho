@@ -283,7 +283,7 @@ vercel --prod
 
 ### Login Credentials (Demo)
 - Email: `admin@gurugramdekho.com`
-- Password: `admin123`
+- Password: `SEED_ADMIN_PASSWORD` (set it before seeding; if unset the seed generates one and prints it once)
 
 ---
 

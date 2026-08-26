@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import prisma from '../lib/db';
 import { parseLegacyHours } from '../lib/opening-hours';
+import { randomBytes } from 'node:crypto';
 
 const img = (id: string, w = 1200) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=70`;
@@ -65,7 +66,25 @@ async function main() {
   console.log('Seeding database…');
 
   // ── Users ────────────────────────────────────────────────
-  const password = await bcrypt.hash('admin123', 10);
+  /*
+    The seed password comes from the environment. It used to be the literal
+    'admin123', which shipped in a public repository and was shared by the
+    admin account and every author account.
+
+    With SEED_ADMIN_PASSWORD unset a strong random one is generated and printed
+    once, so a fresh local seed still works without anyone inventing a weak
+    default. Nothing is ever written back to the repository.
+  */
+  const seedPassword =
+    process.env.SEED_ADMIN_PASSWORD || randomBytes(15).toString('base64url');
+
+  if (!process.env.SEED_ADMIN_PASSWORD) {
+    console.log('\n  SEED_ADMIN_PASSWORD was not set, so one was generated.');
+    console.log('  Save it now, it is not stored anywhere and will not be shown again:');
+    console.log(`\n    ${seedPassword}\n`);
+  }
+
+  const password = await bcrypt.hash(seedPassword, 10);
 
   const admin = await prisma.user.upsert({
     where: { email: 'admin@gurugramdekho.com' },

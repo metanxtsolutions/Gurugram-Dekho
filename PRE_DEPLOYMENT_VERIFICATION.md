@@ -106,7 +106,7 @@ psql gurugramdekho -c "SELECT COUNT(*) FROM Article;"
 - [ ] Visit http://localhost:3000/admin
 - [ ] Redirect to login page
 - [ ] Email: `admin@gurugramdekho.com`
-- [ ] Password: `admin123`
+- [ ] Password: `SEED_ADMIN_PASSWORD` (set it before seeding; if unset the seed generates one and prints it once)
 - [ ] Login successful → redirect to dashboard
 - [ ] Session persists on page reload
 
