@@ -3,8 +3,8 @@ import type { OpenState } from '@/lib/opening-hours';
 const TONE: Record<OpenState['status'], string> = {
   open: 'bg-emerald-500/12 text-emerald-700 ring-emerald-600/20',
   always: 'bg-emerald-500/12 text-emerald-700 ring-emerald-600/20',
-  closed: 'bg-ink-500/8 text-ink-600 ring-ink-500/15',
-  unknown: 'bg-ink-500/8 text-ink-500 ring-ink-500/10',
+  closed: 'bg-ink-500/8 text-fg-muted ring-ink-500/15',
+  unknown: 'bg-ink-500/8 text-fg-subtle ring-ink-500/10',
 };
 
 export function OpenStatus({
@@ -22,7 +22,7 @@ export function OpenStatus({
   const tone = onDark
     ? isOpen
       ? 'bg-emerald-400/15 text-emerald-300 ring-emerald-400/25'
-      : 'bg-white/10 text-ink-300 ring-white/15'
+      : 'bg-card/10 text-fg-subtle ring-white/15'
     : TONE[state.status];
 
   const dot = closingSoon

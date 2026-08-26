@@ -35,9 +35,9 @@ export function ArticleCard({
     return (
       <Link
         href={`/article/${slug}`}
-        className="group flex gap-4 sm:gap-5 rounded-2xl p-3 -m-3 hover:bg-ink-50 transition-colors"
+        className="group flex gap-4 sm:gap-5 rounded-card p-3 -m-3 hover:bg-card-2 transition-colors"
       >
-        <div className="relative w-28 sm:w-36 aspect-square shrink-0 rounded-xl overflow-hidden bg-ink-100">
+        <div className="relative w-28 sm:w-36 aspect-square shrink-0 rounded-card overflow-hidden bg-card-2">
           {image && (
             <Image
               src={image}
@@ -50,11 +50,11 @@ export function ArticleCard({
         </div>
         <div className="min-w-0 py-0.5">
           {category && <span className="eyebrow text-brand-600">{category.name}</span>}
-          <h3 className="mt-2 font-bold text-ink-950 text-[17px] leading-snug clamp-2 group-hover:text-brand-600 transition-colors">
+          <h3 className="mt-2 font-bold text-fg text-[17px] leading-snug clamp-2 group-hover:text-brand-600 transition-colors">
             {title}
           </h3>
           {excerpt && (
-            <p className="mt-1.5 text-sm text-ink-500 clamp-2 hidden sm:block">{excerpt}</p>
+            <p className="mt-1.5 text-sm text-fg-subtle clamp-2 hidden sm:block">{excerpt}</p>
           )}
           <Meta author={author?.name} publishedAt={publishedAt} viewCount={viewCount} />
         </div>
@@ -64,7 +64,7 @@ export function ArticleCard({
 
   return (
     <Link href={`/article/${slug}`} className="group flex flex-col h-full">
-      <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-ink-100">
+      <div className="relative aspect-[16/10] rounded-card overflow-hidden bg-card-2">
         {image ? (
           <Image
             src={image}
@@ -77,16 +77,16 @@ export function ArticleCard({
           <Placeholder name={title} label={category?.name} />
         )}
         {category && (
-          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-white/95 backdrop-blur text-[11px] font-bold text-ink-900 shadow-sm">
+          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-pill bg-card/95 backdrop-blur text-[11px] font-bold text-fg shadow-sm">
             {category.name}
           </span>
         )}
       </div>
 
-      <h3 className="mt-4 font-bold text-ink-950 text-[17px] leading-snug clamp-2 group-hover:text-brand-600 transition-colors">
+      <h3 className="mt-4 font-bold text-fg text-[17px] leading-snug clamp-2 group-hover:text-brand-600 transition-colors">
         {title}
       </h3>
-      {excerpt && <p className="mt-2 text-sm text-ink-500 clamp-2 flex-grow">{excerpt}</p>}
+      {excerpt && <p className="mt-2 text-sm text-fg-subtle clamp-2 flex-grow">{excerpt}</p>}
       <Meta author={author?.name} publishedAt={publishedAt} viewCount={viewCount} />
     </Link>
   );
@@ -102,8 +102,8 @@ function Meta({
   viewCount?: number;
 }) {
   return (
-    <p className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-ink-400">
-      {author && <span className="font-semibold text-ink-500">{author}</span>}
+    <p className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-fg-subtle">
+      {author && <span className="font-semibold text-fg-subtle">{author}</span>}
       {author && publishedAt && <span aria-hidden="true">·</span>}
       {publishedAt && <span>{timeAgo(publishedAt)}</span>}
       {typeof viewCount === 'number' && viewCount > 0 && (

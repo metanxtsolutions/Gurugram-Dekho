@@ -4,6 +4,7 @@ import Link from 'next/link';
 import prisma from '@/lib/db';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { PlaceCard } from '@/components/PlaceCard';
+import { PhotoHero } from '@/components/PhotoHero';
 import { ArticleCard } from '@/components/ArticleCard';
 import { Icon } from '@/components/Icons';
 import { NewsletterCard, SidebarCard } from '@/components/Sidebar';
@@ -94,53 +95,72 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
 
   return (
     <>
-      {/* Header band */}
-      <section className="bg-ink-950 relative isolate overflow-hidden">
-        <div className="absolute inset-0 bg-grid opacity-30" />
-        <div className="absolute -top-24 left-1/4 w-[34rem] h-[34rem] rounded-full bg-brand-500/15 blur-[110px]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-10 md:py-14">
-          <Breadcrumb
-            tone="light"
-            items={[
-              { name: 'Home', href: '/' },
-              ...(area.parent ? [{ name: area.parent.name, href: `/area/${area.parent.slug}` }] : []),
-              { name: area.name, href: `/area/${area.slug}` },
-            ]}
-          />
+      {/* The dark cinematic band this replaced belonged to the old direction,
+          and its muted tokens rendered dark-on-dark after the theme pass. */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-5">
+        <Breadcrumb
+          items={[
+            { name: 'Home', href: '/' },
+            ...(area.parent ? [{ name: area.parent.name, href: `/area/${area.parent.slug}` }] : []),
+            { name: area.name, href: `/area/${area.slug}` },
+          ]}
+        />
+      </div>
 
-          <p className="eyebrow mt-7 text-brand-300 capitalize">{area.type} · Gurugram</p>
-          <h1 className="display mt-3 text-white text-4xl md:text-5xl">{area.name}</h1>
-          {area.tagline && <p className="mt-3 text-lg text-brand-200">{area.tagline}</p>}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-5">
+        <PhotoHero
+          image={area.image?.url ?? null}
+          name={area.name}
+          label={area.type ?? undefined}
+          priority
+          size="sm"
+        >
+          <p className="eyebrow text-white/70 capitalize">{area.type} · Gurugram</p>
+          <h1 className="display mt-2.5 text-white text-[2rem] md:text-[3rem]">{area.name}</h1>
+          {area.tagline && (
+            <p className="mt-2.5 text-[15px] md:text-[17px] text-brand-300 font-medium">
+              {area.tagline}
+            </p>
+          )}
           {area.description && (
-            <p className="mt-4 text-lg text-ink-300 max-w-2xl leading-relaxed">
+            <p className="mt-2.5 text-[14px] md:text-[16px] text-white/80 leading-relaxed max-w-2xl">
               {area.description}
             </p>
           )}
+        </PhotoHero>
 
-          <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-400">
+        {/* Stats sit under the photo so they stay legible whatever the image */}
+        <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-fg-muted">
+          <span className="inline-flex items-center gap-1.5">
+            <Icon name="pin" className="w-4 h-4 text-brand-500" />
+            {totalPlaces} {totalPlaces === 1 ? 'place' : 'places'}
+          </span>
+          <span>
+            {allTypes.length} {allTypes.length === 1 ? 'category' : 'categories'}
+          </span>
+          {topRated && topRated.rating > 0 && (
             <span className="inline-flex items-center gap-1.5">
-              <Icon name="pin" className="w-4 h-4" />
-              {totalPlaces} {totalPlaces === 1 ? 'place' : 'places'}
+              <Icon name="star" className="w-3.5 h-3.5 text-brand-500" />
+              Top rated:{' '}
+              <Link
+                href={`/place/${topRated.slug}`}
+                className="font-medium text-fg hover:text-brand-600 underline underline-offset-2 transition-colors"
+              >
+                {topRated.name}
+              </Link>
             </span>
-            <span>{allTypes.length} {allTypes.length === 1 ? 'category' : 'categories'}</span>
-            {topRated && topRated.rating > 0 && (
-              <span className="inline-flex items-center gap-1.5">
-                <Icon name="star" className="w-3.5 h-3.5 text-brand-400" />
-                Top rated: <Link href={`/place/${topRated.slug}`} className="text-ink-200 hover:text-white underline underline-offset-2">{topRated.name}</Link>
-              </span>
-            )}
-          </div>
+          )}
         </div>
-      </section>
+      </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-12 md:py-16">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14">
           {/* Main column */}
           <div className="lg:col-span-8 min-w-0">
             <div className="flex items-end justify-between gap-6 mb-7">
               <div>
                 <p className="eyebrow text-brand-600">Directory</p>
-                <h2 className="display-sm mt-2.5 text-ink-950 text-3xl">
+                <h2 className="display-sm mt-2.5 text-fg text-3xl">
                   Places in {area.name}
                 </h2>
               </div>
@@ -164,17 +184,17 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
             )}
 
             {places.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 px-8 py-16 text-center">
-                <h3 className="font-bold text-ink-900 text-lg">
+              <div className="rounded-card border border-dashed border-line bg-card-2 px-8 py-16 text-center">
+                <h3 className="display-sm text-fg text-xl">
                   {type ? `No ${type} listings here yet` : 'No places listed yet'}
                 </h3>
-                <p className="mt-2 text-ink-500">
+                <p className="mt-2 text-fg-subtle">
                   We&apos;re still mapping {area.name}. Check back soon.
                 </p>
                 {type && (
                   <Link
                     href={`/area/${area.slug}`}
-                    className="mt-6 inline-flex px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold transition-colors"
+                    className="mt-6 inline-flex px-5 py-2.5 rounded-pill bg-brand-500 hover:bg-brand-400 text-ink-950 text-sm font-semibold transition-colors"
                   >
                     Show all places
                   </Link>
@@ -202,9 +222,9 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
             )}
 
             {guides.length > 0 && (
-              <section className="mt-16 pt-12 border-t border-ink-100">
+              <section className="mt-16 pt-12 border-t border-line">
                 <p className="eyebrow text-brand-600">Read first</p>
-                <h2 className="display-sm mt-2.5 mb-8 text-ink-950 text-2xl">
+                <h2 className="display-sm mt-2.5 mb-8 text-fg text-2xl">
                   Guides about {area.name}
                 </h2>
                 <div className="grid sm:grid-cols-3 gap-8">
@@ -261,10 +281,10 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
                     <li key={t.placeType}>
                       <Link
                         href={`/area/${area.slug}?type=${encodeURIComponent(t.placeType)}`}
-                        className="flex items-center justify-between gap-3 py-2.5 text-[15px] font-medium text-ink-700 hover:text-brand-600 transition-colors"
+                        className="flex items-center justify-between gap-3 py-2.5 text-[15px] font-medium text-fg-muted hover:text-brand-600 transition-colors"
                       >
                         <span className="capitalize truncate">{t.placeType}</span>
-                        <span className="shrink-0 text-xs tabular-nums text-ink-300">
+                        <span className="shrink-0 text-xs tabular-nums text-fg-subtle">
                           {t._count.placeType}
                         </span>
                       </Link>
@@ -280,13 +300,13 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
                   <li key={n.id}>
                     <Link href={`/area/${n.slug}`} className="group block">
                       <span className="flex items-center justify-between gap-3">
-                        <span className="font-semibold text-[15px] text-ink-900 group-hover:text-brand-600 transition-colors">
+                        <span className="font-semibold text-[15px] text-fg group-hover:text-brand-600 transition-colors">
                           {n.name}
                         </span>
-                        <span className="shrink-0 text-xs text-ink-300">{n._count.places}</span>
+                        <span className="shrink-0 text-xs text-fg-subtle">{n._count.places}</span>
                       </span>
                       {n.tagline && (
-                        <span className="block mt-0.5 text-xs text-ink-400 clamp-1">
+                        <span className="block mt-0.5 text-xs text-fg-subtle clamp-1">
                           {n.tagline}
                         </span>
                       )}
@@ -309,8 +329,8 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-4">
-      <dt className="shrink-0 text-ink-400">{label}</dt>
-      <dd className="text-right font-medium text-ink-800">{value}</dd>
+      <dt className="shrink-0 text-fg-subtle">{label}</dt>
+      <dd className="text-right font-medium text-fg">{value}</dd>
     </div>
   );
 }
@@ -327,8 +347,10 @@ function FilterChip({
   return (
     <Link
       href={href}
-      className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium capitalize transition-colors ${
-        active ? 'bg-ink-950 text-white' : 'bg-ink-50 text-ink-600 hover:bg-ink-100 hover:text-ink-900'
+      className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-pill border text-sm font-medium capitalize transition-colors ${
+        active
+          ? 'bg-brand-500 border-brand-500 text-ink-950'
+          : 'bg-card border-line text-fg-muted hover:border-brand-500 hover:text-fg'
       }`}
     >
       {children}

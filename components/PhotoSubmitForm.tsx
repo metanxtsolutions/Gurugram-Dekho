@@ -59,7 +59,7 @@ export function PhotoSubmitForm({ subjectName, placeId, areaId }: Props) {
 
   if (done) {
     return (
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
+      <div className="rounded-card border border-emerald-200 bg-emerald-50 p-6">
         <h3 className="font-bold text-emerald-900">Thank you</h3>
         <p className="mt-1.5 text-sm text-emerald-800">
           An editor will review your photo before it appears on the site.
@@ -72,7 +72,7 @@ export function PhotoSubmitForm({ subjectName, placeId, areaId }: Props) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl border border-dashed border-ink-200 text-sm font-semibold text-ink-600 hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50/40 transition-colors"
+        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-card border border-dashed border-line text-sm font-semibold text-fg-muted hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50/40 transition-colors"
       >
         <Icon name="pin" className="w-4 h-4" />
         Have a photo of {subjectName}? Send it in
@@ -84,12 +84,12 @@ export function PhotoSubmitForm({ subjectName, placeId, areaId }: Props) {
     <form
       ref={formRef}
       onSubmit={submit}
-      className="rounded-2xl border border-ink-100 bg-white p-6 space-y-4"
+      className="rounded-card border border-line bg-card p-6 space-y-4"
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h3 className="font-bold text-ink-950">Add a photo of {subjectName}</h3>
-          <p className="mt-1 text-sm text-ink-500">
+          <h3 className="font-bold text-fg">Add a photo of {subjectName}</h3>
+          <p className="mt-1 text-sm text-fg-subtle">
             Only photos you took yourself. We credit every published photo.
           </p>
         </div>
@@ -97,14 +97,14 @@ export function PhotoSubmitForm({ subjectName, placeId, areaId }: Props) {
           type="button"
           onClick={() => setOpen(false)}
           aria-label="Close"
-          className="shrink-0 grid place-items-center w-8 h-8 rounded-lg text-ink-400 hover:bg-ink-50"
+          className="shrink-0 grid place-items-center w-8 h-8 rounded-full text-fg-subtle hover:bg-card-2"
         >
           <Icon name="close" className="w-4 h-4" />
         </button>
       </div>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className="rounded-card bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
           {error}
         </p>
       )}
@@ -119,14 +119,14 @@ export function PhotoSubmitForm({ subjectName, placeId, areaId }: Props) {
             const f = e.target.files?.[0];
             setPreview(f ? URL.createObjectURL(f) : null);
           }}
-          className="w-full text-sm file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-ink-100 file:text-ink-700 file:font-medium hover:file:bg-ink-200"
+          className="w-full text-sm file:mr-3 file:px-4 file:py-2 file:rounded-pill file:border-0 file:bg-card-2 file:text-fg-muted file:font-medium hover:file:bg-line"
         />
       </Field>
 
       {preview && (
         // Local object URL, so a plain img is correct here.
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={preview} alt="" className="w-full max-h-52 object-cover rounded-xl" />
+        <img src={preview} alt="" className="w-full max-h-52 object-cover rounded-card" />
       )}
 
       <div className="grid sm:grid-cols-2 gap-4">
@@ -136,7 +136,7 @@ export function PhotoSubmitForm({ subjectName, placeId, areaId }: Props) {
             name="submitterName"
             required
             placeholder="How you want to be credited"
-            className="w-full px-4 py-2.5 rounded-xl border border-ink-200 text-sm focus:outline-none focus:border-brand-500"
+            className="w-full px-4 py-2.5 rounded-pill border border-line text-sm focus:outline-none focus:border-brand-500"
           />
         </Field>
         <Field label="Email" name="submitterEmail" errors={fields}>
@@ -145,7 +145,7 @@ export function PhotoSubmitForm({ subjectName, placeId, areaId }: Props) {
             name="submitterEmail"
             required
             placeholder="you@example.com"
-            className="w-full px-4 py-2.5 rounded-xl border border-ink-200 text-sm focus:outline-none focus:border-brand-500"
+            className="w-full px-4 py-2.5 rounded-pill border border-line text-sm focus:outline-none focus:border-brand-500"
           />
         </Field>
       </div>
@@ -156,11 +156,11 @@ export function PhotoSubmitForm({ subjectName, placeId, areaId }: Props) {
           rows={2}
           maxLength={500}
           placeholder="When you took it, what it shows…"
-          className="w-full px-4 py-2.5 rounded-xl border border-ink-200 text-sm focus:outline-none focus:border-brand-500"
+          className="w-full px-4 py-2.5 rounded-pill border border-line text-sm focus:outline-none focus:border-brand-500"
         />
       </Field>
 
-      <label className="flex gap-3 items-start rounded-xl bg-ink-50 p-4">
+      <label className="flex gap-3 items-start rounded-card bg-card-2 p-4">
         <input
           type="checkbox"
           name="licenseAgreed"
@@ -168,7 +168,7 @@ export function PhotoSubmitForm({ subjectName, placeId, areaId }: Props) {
           required
           className="mt-0.5 shrink-0"
         />
-        <span className="text-xs leading-relaxed text-ink-600">{GRANT_TEXT}</span>
+        <span className="text-xs leading-relaxed text-fg-muted">{GRANT_TEXT}</span>
       </label>
       {fields.licenseAgreed && (
         <p role="alert" className="-mt-2 text-sm text-red-600">
@@ -179,11 +179,11 @@ export function PhotoSubmitForm({ subjectName, placeId, areaId }: Props) {
       <button
         type="submit"
         disabled={busy}
-        className="w-full px-5 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold transition-colors disabled:opacity-50"
+        className="w-full px-5 py-3 rounded-pill bg-brand-500 hover:bg-brand-400 text-ink-950 font-semibold transition-colors disabled:opacity-50"
       >
         {busy ? 'Uploading…' : 'Send photo'}
       </button>
-      <p className="text-xs text-ink-400">
+      <p className="text-xs text-fg-subtle">
         Your email is used only to credit you and is never published.
       </p>
     </form>
@@ -205,9 +205,9 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-ink-800 mb-1.5">
+      <label className="block text-sm font-semibold text-fg mb-1.5">
         {label}
-        {optional && <span className="ml-1.5 font-normal text-ink-400">optional</span>}
+        {optional && <span className="ml-1.5 font-normal text-fg-subtle">optional</span>}
       </label>
       {children}
       {errors[name] && (

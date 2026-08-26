@@ -1,14 +1,14 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { ArticleCard } from '@/components/ArticleCard';
-import { Icon } from '@/components/Icons';
+import { Placeholder } from '@/components/Placeholder';
 import {
   AreaChips,
   CategoryList,
-  FeatureRow,
   NewsletterCard,
   PopularList,
   SidebarCard,
@@ -123,22 +123,17 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         })
       : [];
 
-  // The first item on page one gets the wide treatment.
-  const showLead = page === 1 && articles.length > 1;
-  const lead = showLead ? articles[0] : null;
-  const gridArticles = showLead ? articles.slice(1) : articles;
-
   const sortHref = (s: Sort) => `/category/${category.slug}${s === 'latest' ? '' : '?sort=popular'}`;
+  const pageHref = (n: number) =>
+    `/category/${category.slug}?page=${n}${sort === 'popular' ? '&sort=popular' : ''}`;
 
   return (
     <>
-      {/* Header band */}
-      <section className="bg-ink-950 relative isolate overflow-hidden">
-        <div className="absolute inset-0 bg-grid opacity-30" />
-        <div className="absolute -top-24 left-1/3 w-[32rem] h-[32rem] rounded-full bg-brand-500/15 blur-[110px]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-10 md:py-14">
+      {/* Header band. The dark panel this replaced belonged to the previous
+          visual direction, and its muted text tokens went dark-on-dark. */}
+      <section className="border-b border-line bg-card-2">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-5 pb-10 md:pb-12">
           <Breadcrumb
-            tone="light"
             items={[
               { name: 'Home', href: '/' },
               ...(category.parent
@@ -147,32 +142,35 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               { name: category.name, href: `/category/${category.slug}` },
             ]}
           />
-          <h1 className="display mt-6 text-white text-4xl md:text-5xl">{category.name}</h1>
+
+          <h1 className="display mt-6 text-fg text-[2.2rem] md:text-[3.25rem]">{category.name}</h1>
+          <span className="block mt-4 h-[3px] w-14 rounded-full bg-brand-500" />
+
           {category.description && (
-            <p className="mt-4 text-lg text-ink-300 max-w-2xl leading-relaxed">
+            <p className="mt-5 text-[16px] md:text-[17px] text-fg-muted max-w-2xl leading-relaxed">
               {category.description}
             </p>
           )}
 
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <p className="text-sm text-ink-400">
+            <p className="text-sm font-medium text-fg-muted">
               {total} {total === 1 ? 'guide' : 'guides'}
             </p>
             {total > 1 && (
-              <div className="flex items-center gap-1 text-sm">
-                <span className="text-ink-500 mr-1">Sort:</span>
-                {(['latest', 'popular'] as Sort[]).map((s) => (
+              <div className="flex items-center gap-1.5 text-sm">
+                <span className="text-fg-subtle mr-0.5">Sort:</span>
+                {(['latest', 'popular'] as Sort[]).map((srt) => (
                   <Link
-                    key={s}
-                    href={sortHref(s)}
-                    aria-current={sort === s ? 'true' : undefined}
-                    className={`px-3 py-1 rounded-full capitalize transition-colors ${
-                      sort === s
-                        ? 'bg-white text-ink-950 font-semibold'
-                        : 'text-ink-300 hover:text-white hover:bg-white/10'
+                    key={srt}
+                    href={sortHref(srt)}
+                    aria-current={sort === srt ? 'true' : undefined}
+                    className={`px-3.5 py-1.5 rounded-pill border transition-colors ${
+                      sort === srt
+                        ? 'bg-brand-500 border-brand-500 text-ink-950 font-semibold'
+                        : 'bg-card border-line text-fg-muted hover:border-brand-500 hover:text-fg'
                     }`}
                   >
-                    {s === 'latest' ? 'Latest' : 'Most read'}
+                    {srt === 'latest' ? 'Latest' : 'Most read'}
                   </Link>
                 ))}
               </div>
@@ -185,7 +183,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 <Link
                   key={c.id}
                   href={`/category/${c.slug}`}
-                  className="px-3.5 py-1.5 rounded-full border border-white/15 bg-white/5 text-sm text-ink-200 hover:bg-white/10 hover:text-white transition-colors"
+                  className="px-3.5 py-1.5 rounded-pill border border-line bg-card text-sm font-medium text-fg-muted hover:border-brand-500 hover:text-fg transition-colors"
                 >
                   {c.name}
                 </Link>
@@ -195,84 +193,62 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-12 md:py-16">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14">
           {/* Main column */}
           <div className="lg:col-span-8 min-w-0">
             {articles.length === 0 ? (
               <EmptyState categoryName={category.name} />
             ) : (
-              <>
-                {lead && (
-                  <div className="mb-10">
-                    <FeatureRow
-                      href={`/article/${lead.slug}`}
-                      image={lead.featuredImage?.url ?? null}
-                      eyebrow={sort === 'popular' ? 'Most read' : 'Latest'}
-                      title={lead.title}
-                      excerpt={lead.excerpt}
-                      meta={
-                        <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-ink-400">
-                          <span className="font-semibold text-ink-600">{lead.author.name}</span>
-                          <span aria-hidden="true">·</span>
-                          {lead.publishedAt && <span>{formatDate(lead.publishedAt)}</span>}
-                          <span aria-hidden="true">·</span>
-                          <span className="inline-flex items-center gap-1">
-                            <Icon name="clock" className="w-3.5 h-3.5" />
-                            {lead.readMins ?? 5} min read
-                          </span>
-                        </p>
-                      }
-                    />
-                  </div>
-                )}
-
-                <div className="grid sm:grid-cols-2 gap-8">
-                  {gridArticles.map((article) => (
-                    <ArticleCard
-                      key={article.id}
-                      id={article.id}
-                      title={article.title}
-                      slug={article.slug}
-                      excerpt={article.excerpt ?? undefined}
-                      publishedAt={article.publishedAt ?? undefined}
-                      author={article.author}
-                      viewCount={article.viewCount}
-                      featuredImage={article.featuredImage}
-                      category={article.categories[0]?.category}
-                    />
-                  ))}
-                </div>
-              </>
+              /* A vertical list rather than a grid: the reference archive reads
+                 as one column of rows, which also gives the excerpt room. */
+              <div className="divide-y divide-line">
+                {articles.map((article, i) => (
+                  <ArticleRow
+                    key={article.id}
+                    href={`/article/${article.slug}`}
+                    image={article.featuredImage?.url ?? null}
+                    title={article.title}
+                    excerpt={article.excerpt}
+                    category={article.categories[0]?.category?.name}
+                    author={article.author.name}
+                    date={article.publishedAt ? formatDate(article.publishedAt) : null}
+                    readMins={article.readMins ?? 5}
+                    priority={i === 0}
+                  />
+                ))}
+              </div>
             )}
 
             {totalPages > 1 && (
-              <nav className="mt-14 flex items-center justify-center gap-3" aria-label="Pagination">
-                <PageLink
-                  href={`/category/${category.slug}?page=${page - 1}${sort === 'popular' ? '&sort=popular' : ''}`}
-                  disabled={page <= 1}
-                >
-                  Previous
-                </PageLink>
-                <span className="px-4 text-sm text-ink-500">
-                  Page {page} of {totalPages}
-                </span>
-                <PageLink
-                  href={`/category/${category.slug}?page=${page + 1}${sort === 'popular' ? '&sort=popular' : ''}`}
-                  disabled={page >= totalPages}
-                >
-                  Next
-                </PageLink>
+              <nav className="mt-12 flex flex-wrap items-center justify-center gap-2" aria-label="Pagination">
+                {page > 1 && (
+                  <PageLink href={pageHref(page - 1)}>Previous</PageLink>
+                )}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                  <Link
+                    key={n}
+                    href={pageHref(n)}
+                    aria-current={n === page ? 'page' : undefined}
+                    className={`grid place-items-center min-w-10 h-10 px-3 rounded-pill text-sm font-semibold transition-colors ${
+                      n === page
+                        ? 'bg-brand-500 text-ink-950'
+                        : 'bg-card border border-line text-fg-muted hover:border-brand-500 hover:text-fg'
+                    }`}
+                  >
+                    {n}
+                  </Link>
+                ))}
+                {page < totalPages && <PageLink href={pageHref(page + 1)}>Next</PageLink>}
               </nav>
             )}
 
             {elsewhere.length > 0 && (
-              <section className="mt-16 pt-12 border-t border-ink-100">
-                <p className="eyebrow text-brand-600">Elsewhere on the site</p>
-                <h2 className="display-sm mt-2.5 mb-8 text-ink-950 text-2xl">
-                  More from Gurugram Dekho
+              <section className="mt-14 pt-12 border-t border-line">
+                <h2 className="display-sm text-fg text-2xl pb-2.5 border-b-2 border-brand-500 inline-block">
+                  Elsewhere on the site
                 </h2>
-                <div className="grid sm:grid-cols-3 gap-8">
+                <div className="grid sm:grid-cols-3 gap-5 mt-8">
                   {elsewhere.map((a) => (
                     <ArticleCard
                       key={a.id}
@@ -328,42 +304,92 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   );
 }
 
-function PageLink({
-  href,
-  disabled,
-  children,
-}: {
-  href: string;
-  disabled: boolean;
-  children: React.ReactNode;
-}) {
-  if (disabled) {
-    return (
-      <span className="px-5 py-2.5 rounded-xl border border-ink-100 text-sm font-medium text-ink-300 cursor-not-allowed">
-        {children}
-      </span>
-    );
-  }
+function PageLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link
       href={href}
-      className="px-5 py-2.5 rounded-xl border border-ink-200 text-sm font-semibold text-ink-800 hover:border-brand-500 hover:text-brand-600 transition-colors"
+      className="h-10 px-4 grid place-items-center rounded-pill bg-card border border-line text-sm font-semibold text-fg-muted hover:border-brand-500 hover:text-fg transition-colors"
     >
       {children}
     </Link>
   );
 }
 
+/** One row in the archive list: thumbnail, category, title, excerpt, byline. */
+function ArticleRow({
+  href,
+  image,
+  title,
+  excerpt,
+  category,
+  author,
+  date,
+  readMins,
+  priority = false,
+}: {
+  href: string;
+  image: string | null;
+  title: string;
+  excerpt: string | null;
+  category?: string;
+  author: string;
+  date: string | null;
+  readMins: number;
+  priority?: boolean;
+}) {
+  return (
+    <Link href={href} className="group flex gap-4 sm:gap-5 py-6 first:pt-0">
+      <div className="relative w-[112px] sm:w-[220px] shrink-0 aspect-[4/3] overflow-hidden rounded-card bg-card-2">
+        {image ? (
+          <Image
+            src={image}
+            alt=""
+            fill
+            priority={priority}
+            sizes="(max-width: 640px) 112px, 220px"
+            className="object-cover zoom-target"
+          />
+        ) : (
+          <Placeholder name={title} label={category} />
+        )}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        {category && <p className="eyebrow text-brand-600">{category}</p>}
+        <h2 className="display-sm text-[18px] sm:text-[23px] text-fg mt-1.5 clamp-3 group-hover:text-brand-600 transition-colors">
+          {title}
+        </h2>
+        {excerpt && (
+          <p className="mt-2 text-[14px] text-fg-muted clamp-2 hidden sm:block leading-relaxed">
+            {excerpt}
+          </p>
+        )}
+        <p className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-fg-subtle">
+          <span className="font-medium text-fg-muted">{author}</span>
+          {date && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>{date}</span>
+            </>
+          )}
+          <span aria-hidden="true">·</span>
+          <span>{readMins} min read</span>
+        </p>
+      </div>
+    </Link>
+  );
+}
+
 function EmptyState({ categoryName }: { categoryName: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 px-8 py-16 text-center">
-      <h2 className="font-bold text-ink-900 text-lg">No guides in {categoryName} yet</h2>
-      <p className="mt-2 text-ink-500">
+    <div className="rounded-card border border-dashed border-line bg-card-2 px-8 py-16 text-center">
+      <h2 className="display-sm text-fg text-xl">No guides in {categoryName} yet</h2>
+      <p className="mt-2 text-fg-subtle">
         We&apos;re working on this section. Try another category from the sidebar.
       </p>
       <Link
         href="/"
-        className="mt-6 inline-flex px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold transition-colors"
+        className="mt-6 inline-flex px-5 py-2.5 rounded-pill bg-brand-500 hover:bg-brand-400 text-ink-950 text-sm font-semibold transition-colors"
       >
         Back to home
       </Link>

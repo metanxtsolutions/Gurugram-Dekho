@@ -21,13 +21,13 @@ export function ImageCredit({
   if (!line) return null;
 
   return (
-    <p className={`mt-2 text-xs text-ink-400 ${className}`}>
+    <p className={`mt-2 text-xs text-fg-subtle ${className}`}>
       {image.sourceUrl ? (
         <a
           href={image.sourceUrl}
           target="_blank"
           rel="noopener noreferrer nofollow"
-          className="hover:text-ink-600 transition-colors"
+          className="hover:text-fg-muted transition-colors"
         >
           {line}
         </a>

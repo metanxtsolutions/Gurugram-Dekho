@@ -8,10 +8,47 @@ import { PlaceCard } from '@/components/PlaceCard';
 import { Icon } from '@/components/Icons';
 import { QUICK_SEARCHES } from '@/lib/content';
 
+/*
+  Shapes mirror what /api/search returns. Previously `any[]`, which meant a
+  change to the API payload would surface as a runtime error in the card
+  components rather than a type error here.
+*/
+type SearchArticle = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  publishedAt: string | null;
+  viewCount?: number;
+  author?: { name: string } | null;
+  featuredImage?: { url: string } | null;
+  categories?: { category: { name: string; slug: string } }[];
+};
+
+type SearchPlace = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  placeType: string;
+  rating: number;
+  priceRange: string;
+  cuisine: string | null;
+  area?: { name: string; slug: string } | null;
+  image?: { url: string } | null;
+};
+
+type SearchArea = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+};
+
 interface SearchResults {
-  articles: any[];
-  places: any[];
-  areas: any[];
+  articles: SearchArticle[];
+  places: SearchPlace[];
+  areas: SearchArea[];
 }
 
 const EMPTY: SearchResults = { articles: [], places: [], areas: [] };
@@ -34,7 +71,17 @@ function SearchView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => setInput(query), [query]);
+  /*
+    Resync the field when the URL query changes, e.g. on a back navigation or a
+    click on one of the suggestion chips. Adjusting state during render is
+    React's documented pattern for this; doing it in an effect caused a second
+    render pass on every navigation.
+  */
+  const [lastQuery, setLastQuery] = useState(query);
+  if (query !== lastQuery) {
+    setLastQuery(query);
+    setInput(query);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -76,20 +123,20 @@ function SearchView() {
 
   return (
     <>
-      {/* Search band */}
-      <section className="bg-ink-950 relative isolate overflow-hidden">
-        <div className="absolute inset-0 bg-grid opacity-30" />
-        <div className="absolute -top-24 left-1/3 w-[32rem] h-[32rem] rounded-full bg-brand-500/15 blur-[110px]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-12 md:py-16">
-          <h1 className="display text-white text-3xl md:text-5xl">
+      {/* Light band, matching the category header. The dark panel here was the
+          last survivor of the previous visual direction. */}
+      <section className="border-b border-line bg-card-2">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10 md:py-14">
+          <h1 className="display text-fg text-[2rem] md:text-[3rem]">
             {query ? <>Results for &ldquo;{query}&rdquo;</> : 'Search Gurugram Dekho'}
           </h1>
+          <span className="block mt-4 h-[3px] w-14 rounded-full bg-brand-500" />
 
-          <form onSubmit={submit} className="mt-8 flex flex-col sm:flex-row gap-3 max-w-2xl">
+          <form onSubmit={submit} className="mt-7 flex flex-col sm:flex-row gap-3 max-w-2xl">
             <div className="relative flex-1">
               <Icon
                 name="search"
-                className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-ink-400"
+                className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-fg-subtle"
               />
               <input
                 value={input}
@@ -98,13 +145,12 @@ function SearchView() {
                 autoFocus
                 placeholder="Search places, guides, sectors…"
                 aria-label="Search"
-                className="w-full h-14 pr-5 rounded-2xl bg-white text-ink-900 placeholder:text-ink-400 shadow-lift focus:outline-none focus:ring-4 focus:ring-brand-500/30"
-                style={{ paddingLeft: '3.25rem' }}
+                className="w-full h-14 pl-13 pr-5 rounded-pill bg-card border border-line text-fg placeholder:text-fg-subtle shadow-card focus:outline-none focus:border-brand-500 transition-colors"
               />
             </div>
             <button
               type="submit"
-              className="h-14 px-8 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-semibold transition-colors"
+              className="h-14 px-8 rounded-pill bg-brand-500 hover:bg-brand-400 text-ink-950 font-semibold transition-colors"
             >
               Search
             </button>
@@ -112,7 +158,7 @@ function SearchView() {
 
           {!query && (
             <div className="mt-5 flex items-center gap-3">
-              <span className="shrink-0 text-sm text-ink-400">Try:</span>
+              <span className="shrink-0 text-sm text-fg-subtle">Try:</span>
               <div
                 className="min-w-0 flex-1 flex gap-2 overflow-x-auto no-scrollbar py-1 -my-1"
                 role="list"
@@ -122,7 +168,7 @@ function SearchView() {
                     key={q}
                     role="listitem"
                     href={`/search?q=${encodeURIComponent(q)}`}
-                    className="shrink-0 whitespace-nowrap px-3.5 py-1.5 rounded-full border border-white/15 bg-white/5 text-sm text-ink-200 hover:bg-white/10 hover:text-white transition-colors"
+                    className="shrink-0 whitespace-nowrap px-3.5 py-1.5 rounded-pill border border-line bg-card text-sm font-medium text-fg-muted hover:border-brand-500 hover:text-fg transition-colors"
                   >
                     {q}
                   </Link>
@@ -132,33 +178,33 @@ function SearchView() {
           )}
 
           {query && !loading && !error && (
-            <p className="mt-5 text-sm text-ink-400">
+            <p className="mt-5 text-sm font-medium text-fg-muted">
               {total} {total === 1 ? 'result' : 'results'}
             </p>
           )}
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-6 py-12 md:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-12 md:py-16">
         {loading && <ResultsSkeleton />}
 
         {error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-red-800">
+          <div className="rounded-card border border-red-200 bg-red-50 px-6 py-5 text-red-800">
             {error}
           </div>
         )}
 
         {!loading && !error && query && total === 0 && (
-          <div className="rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 px-8 py-16 text-center">
-            <h2 className="font-bold text-ink-900 text-lg">
+          <div className="rounded-card border border-dashed border-line bg-card-2 px-8 py-16 text-center">
+            <h2 className="display-sm text-fg text-xl">
               Nothing matched &ldquo;{query}&rdquo;
             </h2>
-            <p className="mt-2 text-ink-500">
+            <p className="mt-2 text-fg-subtle">
               Try a shorter phrase, a sector name, or browse by category instead.
             </p>
             <Link
               href="/"
-              className="mt-6 inline-flex px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold transition-colors"
+              className="mt-6 inline-flex px-5 py-2.5 rounded-card bg-brand-500 hover:bg-brand-400 text-ink-950 text-sm font-semibold transition-colors"
             >
               Browse categories
             </Link>
@@ -174,16 +220,16 @@ function SearchView() {
                     <Link
                       key={a.id}
                       href={`/area/${a.slug}`}
-                      className="group rounded-2xl border border-ink-100 bg-white p-5 hover:shadow-lift hover:border-transparent transition-all"
+                      className="group rounded-card border border-line bg-card p-5 hover:border-brand-500 transition-colors"
                     >
-                      <span className="grid place-items-center w-10 h-10 rounded-xl bg-brand-100 text-brand-700">
+                      <span className="grid place-items-center w-10 h-10 rounded-card bg-brand-100 text-brand-700">
                         <Icon name="pin" />
                       </span>
-                      <h3 className="mt-4 font-bold text-ink-950 group-hover:text-brand-600 transition-colors">
+                      <h3 className="mt-4 display-sm text-[17px] text-fg group-hover:text-brand-600 transition-colors">
                         {a.name}
                       </h3>
                       {a.description && (
-                        <p className="mt-1.5 text-sm text-ink-500 clamp-2">{a.description}</p>
+                        <p className="mt-1.5 text-sm text-fg-subtle clamp-2">{a.description}</p>
                       )}
                     </Link>
                   ))}
@@ -202,8 +248,8 @@ function SearchView() {
                       slug={p.slug}
                       description={p.description ?? undefined}
                       placeType={p.placeType}
-                      area={p.area}
-                      image={p.image}
+                      area={p.area ?? undefined}
+                      image={p.image ?? undefined}
                       rating={p.rating}
                       priceRange={p.priceRange}
                       cuisine={p.cuisine ?? undefined}
@@ -224,8 +270,8 @@ function SearchView() {
                       slug={a.slug}
                       excerpt={a.excerpt ?? undefined}
                       publishedAt={a.publishedAt ? new Date(a.publishedAt) : undefined}
-                      author={a.author}
-                      featuredImage={a.featuredImage}
+                      author={a.author ?? undefined}
+                      featuredImage={a.featuredImage ?? undefined}
                     />
                   ))}
                 </div>
@@ -250,8 +296,8 @@ function Group({
   return (
     <section>
       <div className="flex items-baseline gap-3 mb-7">
-        <h2 className="display-sm text-ink-950 text-2xl">{title}</h2>
-        <span className="text-sm font-semibold text-ink-400">{count}</span>
+        <h2 className="display-sm text-fg text-2xl">{title}</h2>
+        <span className="text-sm font-semibold text-fg-subtle">{count}</span>
       </div>
       {children}
     </section>
@@ -263,9 +309,9 @@ function ResultsSkeleton() {
     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" aria-busy="true">
       {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className="animate-pulse">
-          <div className="aspect-[4/3] rounded-2xl bg-ink-100" />
-          <div className="h-4 mt-4 rounded bg-ink-100 w-3/4" />
-          <div className="h-3 mt-2.5 rounded bg-ink-100 w-1/2" />
+          <div className="aspect-[4/3] rounded-card bg-card-2" />
+          <div className="h-4 mt-4 rounded bg-card-2 w-3/4" />
+          <div className="h-3 mt-2.5 rounded bg-card-2 w-1/2" />
         </div>
       ))}
     </div>
