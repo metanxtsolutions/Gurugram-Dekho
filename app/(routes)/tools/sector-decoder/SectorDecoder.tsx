@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/Icons';
-import { matchNotes, parseSectorQuery, SECTOR_MAX, type SectorNote } from '@/lib/sectors';
+import { matchNotes, parseSectorQuery, SECTOR_MAX, SECTOR_NOTES, type SectorNote } from '@/lib/sectors';
 
 /*
   Sector decoder.
@@ -136,7 +136,7 @@ export function SectorDecoder({ areas }: { areas: DecoderArea[] }) {
 /* ───────────────────────── pieces ───────────────────────── */
 
 function Result({ note, area }: { note: SectorNote; area?: DecoderArea }) {
-  const name = area?.name ?? note.slug;
+  const name = area?.name ?? note.name;
   return (
     <article className="rounded-card border border-line bg-card overflow-hidden">
       <div className="p-5 sm:p-6">
@@ -216,12 +216,14 @@ function Result({ note, area }: { note: SectorNote; area?: DecoderArea }) {
 }
 
 function Empty({ title, body, areas }: { title: string; body: string; areas: DecoderArea[] }) {
+  // With no Area rows yet, the chips come from the editorial notes instead.
+  const chips = areas.length > 0 ? areas : SECTOR_NOTES.map((n) => ({ slug: n.slug, name: n.name }));
   return (
     <div className="rounded-card border border-dashed border-line bg-card-2 p-5 sm:p-6">
       <h2 className="display-sm text-fg text-xl">{title}</h2>
       <p className="mt-1.5 text-[15px] text-fg-muted max-w-xl">{body}</p>
       <div className="mt-4 flex flex-wrap gap-2">
-        {areas.map((a) => (
+        {chips.map((a) => (
           <Link
             key={a.slug}
             href={`/area/${a.slug}`}

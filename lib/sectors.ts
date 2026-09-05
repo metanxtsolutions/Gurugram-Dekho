@@ -17,6 +17,8 @@
 export type SectorNote = {
   /** Area slug in the database. */
   slug: string;
+  /** Display name. The Area row has one too; this covers an empty database. */
+  name: string;
   /** Sector numbers people use for this area. */
   sectors: number[];
   /** Other names people type. Lowercase. */
@@ -32,6 +34,7 @@ export type SectorNote = {
 export const SECTOR_NOTES: SectorNote[] = [
   {
     slug: 'sector-29',
+    name: 'Sector 29',
     sectors: [29],
     aliases: ['leisure valley', 'huda', 'huda city centre'],
     metro: {
@@ -44,6 +47,7 @@ export const SECTOR_NOTES: SectorNote[] = [
   },
   {
     slug: 'cyber-city',
+    name: 'Cyber City',
     sectors: [24, 25],
     aliases: ['cyber hub', 'dlf cyber city', 'cybercity'],
     metro: {
@@ -56,6 +60,7 @@ export const SECTOR_NOTES: SectorNote[] = [
   },
   {
     slug: 'golf-course-road',
+    name: 'Golf Course Road',
     sectors: [42, 43, 53, 54],
     aliases: ['gcr', 'golf course', 'dlf phase 5', 'phase 5'],
     metro: {
@@ -68,6 +73,7 @@ export const SECTOR_NOTES: SectorNote[] = [
   },
   {
     slug: 'mg-road',
+    name: 'MG Road',
     sectors: [28],
     aliases: ['mehrauli gurgaon road', 'sikanderpur', 'dlf phase 1', 'phase 1'],
     metro: {
@@ -80,6 +86,7 @@ export const SECTOR_NOTES: SectorNote[] = [
   },
   {
     slug: 'sohna-road',
+    name: 'Sohna Road',
     sectors: [47, 48, 49, 50],
     aliases: ['sohna', 'south city', 'south city 2', 'subhash chowk'],
     metro: {
@@ -92,6 +99,7 @@ export const SECTOR_NOTES: SectorNote[] = [
   },
   {
     slug: 'old-gurgaon',
+    name: 'Old Gurgaon',
     sectors: [4, 5, 6, 7, 12, 14],
     aliases: ['sadar', 'sadar bazaar', 'jacobpura', 'old gurugram', 'civil lines', 'sector 14'],
     metro: {
@@ -104,6 +112,7 @@ export const SECTOR_NOTES: SectorNote[] = [
   },
   {
     slug: 'dlf-phase-3',
+    name: 'DLF Phase 3',
     sectors: [24],
     aliases: ['phase 3', 'dlf 3', 'moulsari', 'u block', 'v block'],
     metro: {
@@ -116,6 +125,7 @@ export const SECTOR_NOTES: SectorNote[] = [
   },
   {
     slug: 'sector-56',
+    name: 'Sector 56',
     sectors: [55, 56],
     aliases: ['sector 55', 'sushant lok 2', 'sushant lok'],
     metro: {
@@ -128,6 +138,7 @@ export const SECTOR_NOTES: SectorNote[] = [
   },
   {
     slug: 'udyog-vihar',
+    name: 'Udyog Vihar',
     sectors: [18, 19, 20],
     aliases: ['udyog', 'udyog vihar phase 4', 'uv'],
     metro: {
@@ -177,7 +188,7 @@ export function matchNotes(
   }
 
   const matches = SECTOR_NOTES.filter((n) => {
-    const name = (names[n.slug] ?? n.slug).toLowerCase();
+    const name = (names[n.slug] ?? n.name).toLowerCase();
     return (
       name.includes(text) ||
       n.slug.replace(/-/g, ' ').includes(text) ||
