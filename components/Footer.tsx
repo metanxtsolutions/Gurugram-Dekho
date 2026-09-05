@@ -11,6 +11,7 @@ const COLUMNS = [
       { label: 'Events', href: '/category/events' },
       { label: 'Shopping', href: '/category/shopping' },
       { label: 'Business & Work', href: '/category/business-work' },
+      { label: 'Tools', href: '/tools' },
     ],
   },
   {

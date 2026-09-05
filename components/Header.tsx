@@ -189,6 +189,9 @@ export function Header({
                 <Link href="/contact" onClick={() => setMenuOpen(false)} className="hover:text-fg">
                   Contact
                 </Link>
+                <Link href="/tools" onClick={() => setMenuOpen(false)} className="hover:text-fg">
+                  Tools
+                </Link>
                 <Link href="/search" onClick={() => setMenuOpen(false)} className="hover:text-fg">
                   Search
                 </Link>
