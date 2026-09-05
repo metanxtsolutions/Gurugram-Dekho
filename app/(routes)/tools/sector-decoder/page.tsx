@@ -13,8 +13,13 @@ export const metadata: Metadata = {
   alternates: { canonical: '/tools/sector-decoder' },
 };
 
-// Areas change when an editor publishes, not per request.
-export const revalidate = 300;
+/*
+  Rendered per request. Both tools read the URL query on the server so the
+  first HTML already contains the result: statically prerendered, a client
+  component calling useSearchParams() bails out to its Suspense fallback, and
+  the live page shipped an empty 520px card instead of the calculator.
+*/
+export const dynamic = 'force-dynamic';
 
 async function getAreas(): Promise<DecoderArea[]> {
   try {
