@@ -54,10 +54,10 @@ export function SignupForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+      <div className="max-w-md w-full bg-card rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Gurugram Dekho</h1>
-          <p className="text-gray-600">Create Admin Account</p>
+          <h1 className="text-3xl font-bold text-fg mb-2">Gurugram Dekho</h1>
+          <p className="text-fg-muted">Create Admin Account</p>
         </div>
 
         {error && (
@@ -68,7 +68,7 @@ export function SignupForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-fg mb-2">
               Full Name
             </label>
             <input
@@ -82,7 +82,7 @@ export function SignupForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-fg mb-2">
               Email
             </label>
             <input
@@ -96,7 +96,7 @@ export function SignupForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-fg mb-2">
               Password
             </label>
             <input
@@ -110,7 +110,7 @@ export function SignupForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-fg mb-2">
               Confirm Password
             </label>
             <input
@@ -132,7 +132,7 @@ export function SignupForm() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600">
+        <div className="mt-6 text-center text-sm text-fg-muted">
           Already have an account?{' '}
           <Link href="/auth/login" className="text-orange-500 hover:text-orange-600 font-semibold">
             Login

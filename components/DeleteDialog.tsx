@@ -34,9 +34,9 @@ export function DeleteDialog({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">{title}</h2>
-        <p className="text-gray-600 mb-4">{message}</p>
+      <div className="bg-card rounded-lg shadow-lg p-6 max-w-sm">
+        <h2 className="text-xl font-bold text-fg mb-2">{title}</h2>
+        <p className="text-fg-muted mb-4">{message}</p>
 
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
@@ -48,7 +48,7 @@ export function DeleteDialog({
           <button
             onClick={onCancel}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 border rounded hover:bg-gray-50 font-semibold disabled:opacity-50"
+            className="flex-1 px-4 py-2 border rounded hover:bg-card-2 font-semibold disabled:opacity-50"
           >
             Cancel
           </button>

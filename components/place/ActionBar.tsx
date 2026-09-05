@@ -32,7 +32,7 @@ export function ActionBar({
 
   const wrapper =
     variant === 'sticky'
-      ? 'lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-ink-100 bg-white/95 backdrop-blur px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] grid gap-2'
+      ? 'lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-line bg-card/95 backdrop-blur px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] grid gap-2'
       : 'hidden lg:grid gap-2';
 
   return (
@@ -46,10 +46,10 @@ export function ActionBar({
           key={a.label}
           href={a.href}
           {...(a.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-          className={`inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+          className={`inline-flex items-center justify-center gap-2 px-4 py-3 rounded-pill text-sm font-semibold transition-colors ${
             a.primary
-              ? 'bg-brand-500 hover:bg-brand-600 text-white'
-              : 'border border-ink-200 text-ink-800 hover:border-ink-300 hover:bg-ink-50'
+              ? 'bg-brand-500 hover:bg-brand-400 text-ink-950'
+              : 'border border-line text-fg hover:border-ink-300 hover:bg-card-2'
           }`}
         >
           <Icon name={a.icon} className="w-[18px] h-[18px]" />

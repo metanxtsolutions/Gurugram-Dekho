@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import prisma from '@/lib/db';
 import { Breadcrumb } from '@/components/Breadcrumb';
@@ -8,7 +7,7 @@ import { PlaceCard } from '@/components/PlaceCard';
 import { Icon } from '@/components/Icons';
 import { ImageCredit } from '@/components/ImageCredit';
 import { PhotoSubmitForm } from '@/components/PhotoSubmitForm';
-import { Placeholder } from '@/components/Placeholder';
+import { PhotoHero } from '@/components/PhotoHero';
 import { OpenStatus } from '@/components/place/OpenStatus';
 import { HoursTable } from '@/components/place/HoursTable';
 import { ActionBar } from '@/components/place/ActionBar';
@@ -110,65 +109,60 @@ export default async function PlacePage({ params }: PlacePageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      {/* Full-bleed image, so the phone screen leads with the place itself. */}
-      <div className="relative aspect-[4/3] sm:aspect-[21/9] lg:aspect-[21/8] bg-ink-100">
-        {place.image?.url ? (
-          <Image
-            src={place.image.url}
-            alt={place.name}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        ) : (
-          <Placeholder name={place.name} label={place.placeType} />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950/85 via-ink-950/25 to-transparent" />
+      {/* Contained rounded hero, matching the article and area pages. The
+          full-bleed version predated those and was the odd one out. */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-5">
+        <Breadcrumb
+          items={[
+            { name: 'Home', href: '/' },
+            ...(place.area ? [{ name: place.area.name, href: `/area/${place.area.slug}` }] : []),
+            { name: place.name, href: `/place/${place.slug}` },
+          ]}
+        />
+      </div>
 
-        <div className="absolute inset-x-0 bottom-0">
-          <div className="mx-auto max-w-6xl px-5 sm:px-6 pb-5 sm:pb-8">
-            <Breadcrumb
-              tone="light"
-              items={[
-                { name: 'Home', href: '/' },
-                ...(place.area ? [{ name: place.area.name, href: `/area/${place.area.slug}` }] : []),
-                { name: place.name, href: `/place/${place.slug}` },
-              ]}
-            />
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-md bg-brand-500 text-white text-[11px] font-bold uppercase tracking-wide">
-                {place.placeType}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-5">
+        <PhotoHero
+          image={place.image?.url ?? null}
+          name={place.name}
+          label={place.placeType}
+          priority
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-2.5 py-1 rounded-pill bg-brand-500 text-ink-950 text-[11px] font-semibold uppercase tracking-wide">
+              {place.placeType}
+            </span>
+            {place.featured && (
+              <span className="px-2.5 py-1 rounded-pill bg-white/15 backdrop-blur-sm border border-white/25 text-white text-[11px] font-semibold uppercase tracking-wide">
+                Editors&apos; pick
               </span>
-              {place.featured && (
-                <span className="px-2.5 py-1 rounded-md bg-white/15 backdrop-blur text-white text-[11px] font-bold uppercase tracking-wide">
-                  Editors&apos; pick
-                </span>
-              )}
-            </div>
-            <h1 className="display mt-2.5 text-white text-[2rem] sm:text-5xl">{place.name}</h1>
+            )}
           </div>
-        </div>
+          <h1 className="display mt-3 text-white text-[2rem] md:text-[3rem]">{place.name}</h1>
+          {place.area && (
+            <p className="mt-2.5 text-[14px] text-white/75">{place.area.name}, Gurugram</p>
+          )}
+        </PhotoHero>
       </div>
 
       {/* Fact strip, the answers people came for, above the fold. */}
-      <div className="border-b border-ink-100 bg-white">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6 py-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mt-5 pb-5 border-b border-line">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
             <OpenStatus state={openState} />
 
             {place.rating > 0 && (
-              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-900">
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-fg">
                 <Icon name="star" className="w-4 h-4 text-brand-500" />
                 {place.rating.toFixed(1)}
               </span>
             )}
-            <span className="text-sm font-semibold text-ink-700">{place.priceRange}</span>
-            {place.cuisine && <span className="text-sm text-ink-600">{place.cuisine}</span>}
+            <span className="text-sm font-semibold text-fg-muted">{place.priceRange}</span>
+            {place.cuisine && <span className="text-sm text-fg-muted">{place.cuisine}</span>}
             {place.area && (
               <Link
                 href={`/area/${place.area.slug}`}
-                className="inline-flex items-center gap-1.5 text-sm text-ink-600 hover:text-brand-600 transition-colors"
+                className="inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-brand-600 transition-colors"
               >
                 <Icon name="pin" className="w-4 h-4" />
                 {place.area.name}
@@ -179,28 +173,28 @@ export default async function PlacePage({ params }: PlacePageProps) {
       </div>
 
       {/* Bottom padding leaves room for the sticky mobile action bar. */}
-      <div className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-12 pb-28 lg:pb-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 sm:py-12 pb-28 lg:pb-12">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-14">
           <div className="lg:col-span-7 min-w-0">
             {place.image && <ImageCredit image={place.image} className="mb-6 -mt-2" />}
 
             {place.description && (
               <>
-                <h2 className="display-sm text-ink-950 text-xl sm:text-2xl mb-3">
+                <h2 className="display-sm text-fg text-xl sm:text-2xl mb-3">
                   About {place.name}
                 </h2>
-                <p className="text-[1.0625rem] leading-[1.75] text-ink-700">{place.description}</p>
+                <p className="text-[1.0625rem] leading-[1.75] text-fg-muted">{place.description}</p>
               </>
             )}
 
             {place.specialties && (
               <div className="mt-8">
-                <h3 className="font-bold text-ink-950 mb-3">Known for</h3>
+                <h3 className="font-bold text-fg mb-3">Known for</h3>
                 <div className="flex flex-wrap gap-2">
                   {place.specialties.split(',').map((s) => (
                     <span
                       key={s}
-                      className="px-3 py-1.5 rounded-lg bg-ink-50 text-sm font-medium text-ink-700"
+                      className="px-3 py-1.5 rounded-pill bg-card-2 border border-line text-sm font-medium text-fg-muted"
                     >
                       {s.trim()}
                     </span>
@@ -223,7 +217,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
               variant="inline"
             />
 
-            <div className="rounded-2xl border border-ink-100 bg-white p-5 sm:p-6 space-y-5">
+            <div className="rounded-card border border-line bg-card p-5 sm:p-6 space-y-5">
               {place.address && (
                 <a
                   href={mapsUrl}
@@ -233,8 +227,8 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 >
                   <Icon name="pin" className="w-4 h-4 mt-0.5 shrink-0 text-brand-500" />
                   <span className="min-w-0">
-                    <span className="block text-xs font-semibold text-ink-400">Address</span>
-                    <span className="block text-sm text-ink-800 group-hover:text-brand-600 transition-colors">
+                    <span className="block text-xs font-semibold text-fg-subtle">Address</span>
+                    <span className="block text-sm text-fg group-hover:text-brand-600 transition-colors">
                       {place.address}
                     </span>
                     <span className="mt-0.5 inline-flex items-center gap-1 text-xs font-semibold text-brand-600">
@@ -249,25 +243,25 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 <a href={`tel:${place.phone}`} className="group flex gap-3">
                   <Icon name="phone" className="w-4 h-4 mt-0.5 shrink-0 text-brand-500" />
                   <span>
-                    <span className="block text-xs font-semibold text-ink-400">Phone</span>
-                    <span className="block text-sm text-ink-800 group-hover:text-brand-600 transition-colors">
+                    <span className="block text-xs font-semibold text-fg-subtle">Phone</span>
+                    <span className="block text-sm text-fg group-hover:text-brand-600 transition-colors">
                       {place.phone}
                     </span>
                   </span>
                 </a>
               )}
 
-              <div className="pt-5 border-t border-ink-100">
+              <div className="pt-5 border-t border-line">
                 <HoursTable intervals={place.openingHours} alwaysOpen={place.alwaysOpen} />
               </div>
             </div>
 
             {place.area && (
-              <div className="rounded-2xl bg-ink-50 border border-ink-100 p-5 sm:p-6">
-                <h3 className="eyebrow text-ink-400 mb-2">Neighbourhood</h3>
-                <p className="font-bold text-ink-950">{place.area.name}</p>
+              <div className="rounded-card bg-card-2 border border-line p-5 sm:p-6">
+                <h3 className="eyebrow text-fg-subtle mb-2">Neighbourhood</h3>
+                <p className="font-bold text-fg">{place.area.name}</p>
                 {place.area.tagline && (
-                  <p className="mt-1 text-sm text-ink-500">{place.area.tagline}</p>
+                  <p className="mt-1 text-sm text-fg-subtle">{place.area.tagline}</p>
                 )}
                 <Link
                   href={`/area/${place.area.slug}`}
@@ -286,9 +280,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
         </div>
 
         {nearby.length > 0 && (
-          <section className="mt-14 pt-12 border-t border-ink-100">
+          <section className="mt-14 pt-12 border-t border-line">
             <p className="eyebrow text-brand-600">Nearby</p>
-            <h2 className="display-sm mt-2 mb-8 text-ink-950 text-2xl sm:text-3xl">
+            <h2 className="display-sm mt-2 mb-8 text-fg text-2xl sm:text-3xl">
               More in {place.area?.name ?? 'Gurugram'}
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

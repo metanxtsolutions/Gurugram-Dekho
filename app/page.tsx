@@ -1,456 +1,453 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@/components/Icons';
-import { HERO_IMAGE, QUICK_SEARCHES } from '@/lib/content';
 import { getHomepageData } from '@/lib/homepage';
+import { EXPLORE_CARDS } from '@/lib/explore';
+import { HomeSearch } from '@/components/HomeSearch';
+import { Placeholder } from '@/components/Placeholder';
 
 // Content changes when an editor publishes; revalidate rather than hitting the
 // database on every request.
 export const revalidate = 300;
 
 export default async function Home() {
-  const { featured, latest, areas, places, categories, stats } = await getHomepageData();
-  const [lead, ...rest] = featured;
+  const { featured, latest, areas, places, categories, stats, usingFallback } =
+    await getHomepageData();
+
+  /*
+    One deduped pool, allocated in order. The first build sliced `latest` into
+    four disjoint buckets, which assumed roughly twenty stories: the site has
+    eight, so three of the four sections rendered empty and the main column
+    collapsed to a blank strip beside the sidebar. Everything below takes from
+    the same pool and each section only renders once it has something.
+  */
+  const seen = new Set<string>();
+  const pool = [...featured, ...latest].filter((s) => {
+    if (seen.has(s.slug)) return false;
+    seen.add(s.slug);
+    return true;
+  });
+
+  const [lead, ...restPool] = pool;
+  const tall = restPool[0];
+  const railStories = restPool.slice(1, 5);
+  const moreGuides = restPool.slice(5);
 
   return (
     <>
-      {/* ───────────────────────── Hero ───────────────────────── */}
-      <section className="relative isolate overflow-hidden bg-ink-950">
-        <Image
-          src={HERO_IMAGE}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover opacity-[0.28]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-ink-950 via-ink-950/85 to-brand-900/50" />
-        <div className="absolute inset-0 bg-grid opacity-[0.35]" />
-        {/* warm glow behind the headline */}
-        <div className="absolute -top-32 left-1/4 w-[42rem] h-[42rem] rounded-full bg-brand-500/20 blur-[120px]" />
+      {/* ═══════════════ Hero ═══════════════ */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 pt-10 pb-6 md:pt-16 md:pb-10 text-center">
+        <h1 className="display text-fg text-[2.6rem] sm:text-6xl lg:text-[4.5rem] max-w-4xl mx-auto">
+          Explore the <span className="text-brand-500">Millennium City</span>!
+        </h1>
+        <p className="mt-5 text-[17px] md:text-lg text-fg-muted max-w-2xl mx-auto leading-relaxed">
+          Honest guides to food, neighbourhoods, rentals and work in Gurugram,
+          written by people who actually live here. Nobody pays to be listed.
+        </p>
 
-        <div className="relative mx-auto max-w-7xl px-6 pt-16 pb-14 md:pt-24 md:pb-20">
-          <div className="max-w-3xl">
-            <p className="eyebrow text-brand-300 mb-5">
-              Gurugram · Gurgaon · Millennium City
-            </p>
-            <h1 className="display text-white text-[2.6rem] sm:text-6xl lg:text-[4.25rem]">
-              Everything worth knowing about{' '}
-              <span className="text-brand-400">Gurugram</span>.
-            </h1>
-            <p className="mt-6 text-lg md:text-xl text-ink-200 max-w-2xl leading-relaxed">
-              Honest guides to food, neighbourhoods, rentals and work, written
-              by people who actually live here. No paid listings, no filler.
-            </p>
+        <HomeSearch className="mt-8" />
+      </section>
 
-            {/* Search */}
-            <form
-              action="/search"
-              className="mt-9 flex flex-col sm:flex-row gap-3 max-w-2xl"
+      {/* ═══════════════ The four Explore cards ═══════════════ */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 pb-14 md:pb-20">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+          {EXPLORE_CARDS.map((card) => (
+            <Link
+              key={card.slug}
+              href={card.href}
+              className="group relative isolate overflow-hidden rounded-card aspect-[3/4] sm:aspect-[4/5] shadow-card hover:shadow-lift transition-shadow"
             >
-              <div className="relative flex-1">
-                <Icon
-                  name="search"
-                  className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-ink-400"
-                />
-                <input
-                  name="q"
-                  type="search"
-                  required
-                  minLength={2}
-                  placeholder="Try “rooftop in Sector 29” or “PG near Cyber City”"
-                  aria-label="Search Gurugram Dekho"
-                  className="w-full h-14 pl-13 pr-5 rounded-2xl bg-white text-ink-900 text-[15px] placeholder:text-ink-400 shadow-lift focus:outline-none focus:ring-4 focus:ring-brand-500/30"
-                  style={{ paddingLeft: '3.25rem' }}
-                />
+              <Image
+                src={card.image}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover zoom-target"
+              />
+              <div className="absolute inset-0 photo-scrim" />
+              <div className="absolute inset-x-0 bottom-0 p-4 md:p-5 text-center">
+                <p className="eyebrow text-white/75">Explore</p>
+                <h2 className="display-sm text-white text-[22px] md:text-[27px] mt-1">
+                  {card.name}
+                </h2>
+                <span className="inline-block mt-3 px-4 py-2 rounded-pill bg-white/12 backdrop-blur-sm border border-white/25 text-white text-[13px] font-medium group-hover:bg-brand-500 group-hover:border-brand-500 group-hover:text-ink-950 transition-colors">
+                  {card.cta}
+                </span>
               </div>
-              <button
-                type="submit"
-                className="h-14 px-8 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-[15px] transition-colors shadow-lift"
-              >
-                Search
-              </button>
-            </form>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-            {/* Quick searches: a single scrolling rail rather than a wrapping
-                block, so the hero keeps a fixed height as terms are added. */}
-            <div className="mt-5 flex items-center gap-3">
-              <span className="shrink-0 text-sm text-ink-400">Popular:</span>
-              <div
-                className="min-w-0 flex-1 flex gap-2 overflow-x-auto no-scrollbar py-1 -my-1"
-                role="list"
-              >
-                {QUICK_SEARCHES.map((q) => (
+      {/* ═══════════════ Blog feed: the magazine block ═══════════════ */}
+      {lead && (
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 pb-14 md:pb-20">
+          <SectionHead title="Explore Our Blog Feed" />
+
+          <div className="grid gap-4 md:gap-5 lg:grid-cols-12">
+            {/* Tall card, left */}
+            {tall && (
+              <div className="lg:col-span-3">
+                <PhotoStory story={tall} className="h-full min-h-[320px] lg:min-h-[520px]" />
+              </div>
+            )}
+
+            {/* The lead, centre */}
+            <div className="lg:col-span-6">
+              <PhotoStory story={lead} large className="h-full min-h-[360px] lg:min-h-[520px]" />
+            </div>
+
+            {/* Thumbnail rail, right */}
+            <div className="lg:col-span-3 flex flex-col gap-3">
+              {railStories.map((s) => (
+                <Link
+                  key={s.slug}
+                  href={`/article/${s.slug}`}
+                  className="group flex items-center gap-3 rounded-card bg-card border border-line p-2.5 hover:border-brand-300 transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <h3 className="display-sm text-[15px] text-fg clamp-3 group-hover:text-brand-600 transition-colors">
+                      {s.title}
+                    </h3>
+                    <p className="mt-1.5 text-[12px] text-fg-subtle">{s.date}</p>
+                  </div>
+                  <div className="relative w-[68px] h-[68px] shrink-0 overflow-hidden rounded-[10px]">
+                    <Image
+                      src={s.image}
+                      alt=""
+                      fill
+                      sizes="68px"
+                      className="object-cover zoom-target"
+                    />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════ Areas ═══════════════ */}
+      {areas.length > 0 && (
+        <section className="bg-card-2 border-y border-line">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-14 md:py-20">
+            <SectionHead
+              title="Read the city"
+              blurb="Nobody arrives knowing what Sector 29 is. Here is the shortest version."
+            />
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+              {areas.slice(0, 6).map((a) => (
+                <AreaTile key={a.slug} area={a} photo={!usingFallback} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════ More guides + sidebar ═══════════════ */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 py-14 md:py-20">
+        {/*
+          The two-column layout is only used when there are guides to put in the
+          left column. With none, the sidebar blocks lay out across the full
+          width instead of leaving a blank strip beside them.
+        */}
+        <div
+          className={
+            moreGuides.length > 0
+              ? 'grid gap-10 lg:gap-12 lg:grid-cols-[1fr_320px]'
+              : ''
+          }
+        >
+          {moreGuides.length > 0 && (
+            <div>
+              <SectionHead title="More guides" align="left" />
+              <div className="grid sm:grid-cols-2 gap-4">
+                {moreGuides.map((s) => (
                   <Link
-                    key={q}
-                    role="listitem"
-                    href={`/search?q=${encodeURIComponent(q)}`}
-                    className="shrink-0 whitespace-nowrap px-3.5 py-1.5 rounded-full border border-white/15 bg-white/5 text-sm text-ink-200 hover:bg-white/10 hover:text-white transition-colors"
+                    key={s.slug}
+                    href={`/article/${s.slug}`}
+                    className="group rounded-card bg-card border border-line overflow-hidden hover:shadow-card transition-shadow"
                   >
-                    {q}
+                    <div className="relative aspect-[16/9] overflow-hidden">
+                      <Image
+                        src={s.image}
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 100vw, 340px"
+                        className="object-cover zoom-target"
+                      />
+                      <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-pill bg-brand-500 text-ink-950 text-[11px] font-semibold">
+                        {s.category}
+                      </span>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="display-sm text-[17px] text-fg clamp-2 group-hover:text-brand-600 transition-colors">
+                        {s.title}
+                      </h3>
+                      <p className="mt-2 text-[13px] text-fg-muted clamp-2">{s.excerpt}</p>
+                      <p className="mt-2.5 text-[12px] text-fg-subtle">
+                        {s.date} · {s.readMins} min read
+                      </p>
+                    </div>
                   </Link>
                 ))}
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Stats */}
-          <dl className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-px rounded-2xl overflow-hidden bg-white/10 border border-white/10">
-            {[
-              [stats.places.toLocaleString('en-IN'), 'Places listed'],
-              [stats.areas.toLocaleString('en-IN'), 'Areas covered'],
-              [stats.guides.toLocaleString('en-IN'), 'Guides published'],
-              ['Weekly', 'Updates'],
-            ].map(([value, label]) => (
-              <div key={label} className="bg-ink-950/60 px-6 py-5 backdrop-blur-sm">
-                <dt className="display-sm text-2xl md:text-3xl text-white">{value}</dt>
-                <dd className="mt-1 text-sm text-ink-400">{label}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </section>
-
-      {/* ──────────────────── Featured stories ──────────────────── */}
-      {lead && (
-      <section className="mx-auto max-w-7xl px-6 py-16 md:py-20">
-        <SectionHead
-          eyebrow="This week"
-          title="What's hot in Gurugram"
-          href="/category/food-dining"
-          linkLabel="All stories"
-        />
-
-        <div className="grid lg:grid-cols-12 gap-6 lg:gap-8">
-          {/* Lead story */}
-          <Link
-            href={`/article/${lead.slug}`}
-            className="group lg:col-span-7 relative rounded-3xl overflow-hidden bg-ink-950 shadow-card hover:shadow-lift transition-shadow"
+          <aside
+            className={
+              moreGuides.length > 0
+                ? 'space-y-8'
+                : 'grid gap-5 md:grid-cols-2 lg:grid-cols-4 items-start'
+            }
           >
-            <div className="relative aspect-[16/11] sm:aspect-[16/10]">
-              <CardImage
-                src={lead.image}
-                alt={lead.title}
-                sizes="(max-width: 1024px) 100vw, 58vw"
-                className="object-cover zoom-target"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/55 to-transparent" />
-            </div>
-            <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-brand-500 text-white text-xs font-bold tracking-wide">
-                {lead.category}
-              </span>
-              <h3 className="display-sm mt-4 text-white text-2xl sm:text-[2rem] clamp-3">
-                {lead.title}
-              </h3>
-              <p className="mt-3 text-ink-200 clamp-2 max-w-xl">{lead.excerpt}</p>
-              <Meta
-                className="mt-5 text-ink-300"
-                author={lead.author}
-                date={lead.date}
-                readMins={lead.readMins}
-              />
-            </div>
-          </Link>
-
-          {/* Secondary stories */}
-          <div className="lg:col-span-5 flex flex-col gap-5">
-            {rest.map((s) => (
-              <Link
-                key={s.slug}
-                href={`/article/${s.slug}`}
-                className="group flex gap-4 sm:gap-5 rounded-2xl p-3 -m-3 hover:bg-ink-50 transition-colors"
-              >
-                <div className="relative w-28 sm:w-36 aspect-square shrink-0 rounded-xl overflow-hidden bg-ink-100">
-                  <CardImage
-                    src={s.image}
-                    alt={s.title}
-                    sizes="144px"
-                    className="object-cover zoom-target"
-                  />
-                </div>
-                <div className="min-w-0 py-0.5">
-                  <span className="eyebrow text-brand-600">{s.category}</span>
-                  <h3 className="mt-2 font-bold text-ink-950 text-[17px] leading-snug clamp-2 group-hover:text-brand-600 transition-colors">
-                    {s.title}
-                  </h3>
-                  <p className="mt-1.5 text-sm text-ink-500 clamp-2 hidden sm:block">
-                    {s.excerpt}
-                  </p>
-                  <Meta className="mt-2.5 text-ink-400" date={s.date} readMins={s.readMins} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-      )}
-
-      {/* ────────────────────── Categories ────────────────────── */}
-      <section className="bg-ink-50/70 border-y border-ink-100">
-        <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
-          <SectionHead eyebrow="Browse" title="Explore by category" />
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {categories.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/category/${c.slug}`}
-                className="group relative rounded-2xl bg-white border border-ink-100 p-5 sm:p-6 hover:border-transparent hover:shadow-lift transition-all hover:-translate-y-0.5"
-              >
-                <span
-                  className={`grid place-items-center w-11 h-11 rounded-xl ${c.tone}`}
-                >
-                  <Icon name={c.icon} className="w-[22px] h-[22px]" />
-                </span>
-                <h3 className="mt-4 font-bold text-ink-950 group-hover:text-brand-600 transition-colors">
-                  {c.name}
-                </h3>
-                <p className="mt-1 text-sm text-ink-500 clamp-2">{c.blurb}</p>
-                <p className="mt-3 text-xs font-semibold text-ink-400">
-                  {c.count} guides
-                </p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────────────────  Areas ─────────────────────── */}
-      <section className="mx-auto max-w-7xl px-6 py-16 md:py-20">
-        <SectionHead
-          eyebrow="Neighbourhoods"
-          title="Where in Gurugram?"
-          description="Every sector has its own personality. Start with the ones people ask about most."
-        />
-
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {areas.map((a) => (
-            <Link
-              key={a.slug}
-              href={`/area/${a.slug}`}
-              className="group relative rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[3/2] bg-ink-900 shadow-card hover:shadow-lift transition-shadow"
-            >
-              <CardImage
-                src={a.image}
-                alt={a.name}
-                sizes="(max-width: 1024px) 50vw, 33vw"
-                className="object-cover opacity-80 zoom-target"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink-950/95 via-ink-950/30 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <h3 className="font-bold text-white text-lg sm:text-xl">{a.name}</h3>
-                <p className="text-sm text-ink-300 mt-0.5">{a.tagline}</p>
-                <p className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-300">
-                  <Icon name="pin" className="w-3.5 h-3.5" />
-                  {a.places} places
-                </p>
+            <SidebarBlock title="Categories">
+              <div className="space-y-1">
+                {categories.slice(0, 8).map((c) => (
+                  <Link
+                    key={c.slug}
+                    href={`/category/${c.slug}`}
+                    className="flex items-center justify-between py-2.5 border-b border-line text-[15px] font-medium text-fg hover:text-brand-600 transition-colors"
+                  >
+                    {c.name}
+                    <span className="text-[13px] text-fg-subtle tabular-nums">{c.count}</span>
+                  </Link>
+                ))}
               </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+            </SidebarBlock>
 
-      {/* ─────────────────────── Places ─────────────────────── */}
-      <section className="bg-ink-50/70 border-y border-ink-100">
-        <div className="mx-auto max-w-7xl px-6 py-16 md:py-20">
-          <SectionHead
-            eyebrow="Editors' picks"
-            title="Places worth your evening"
-            href="/category/food-dining"
-            linkLabel="All places"
-          />
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {places.map((p) => (
-              <Link
-                key={p.slug}
-                href={`/place/${p.slug}`}
-                className="group rounded-2xl overflow-hidden bg-white border border-ink-100 hover:shadow-lift hover:border-transparent transition-all"
-              >
-                <div className="relative aspect-[4/3] bg-ink-100 overflow-hidden">
-                  <CardImage
-                    src={p.image}
-                    alt={p.name}
-                    sizes="(max-width: 1024px) 50vw, 25vw"
-                    className="object-cover zoom-target"
-                  />
-                  <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/95 backdrop-blur text-xs font-bold text-ink-900 shadow-sm">
-                    <Icon name="star" className="w-3.5 h-3.5 text-brand-500" />
-                    {p.rating.toFixed(1)}
-                  </span>
+            {places.length > 0 && (
+              <SidebarBlock title="Places worth knowing">
+                <div className="space-y-3">
+                  {places.slice(0, 4).map((pl) => (
+                    <Link
+                      key={pl.slug}
+                      href={`/place/${pl.slug}`}
+                      className="group flex items-center gap-3"
+                    >
+                      <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-[10px]">
+                        {usingFallback ? (
+                          <Placeholder name={pl.name} />
+                        ) : (
+                          <Image src={pl.image} alt="" fill sizes="48px" className="object-cover zoom-target" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[14px] font-medium text-fg truncate group-hover:text-brand-600 transition-colors">
+                          {pl.name}
+                        </p>
+                        <p className="text-[12px] text-fg-subtle truncate">
+                          {pl.area} · {pl.priceRange}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-ink-950 clamp-2 group-hover:text-brand-600 transition-colors">
-                    {p.name}
-                  </h3>
-                  <p className="mt-1 text-sm text-ink-500">{p.cuisine}</p>
-                  <div className="mt-3 flex items-center justify-between text-xs">
-                    <span className="inline-flex items-center gap-1 text-ink-500">
-                      <Icon name="pin" className="w-3.5 h-3.5" />
-                      {p.area}
-                    </span>
-                    <span className="font-semibold text-ink-700">{p.priceRange}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+              </SidebarBlock>
+            )}
 
-      {/* ─────────────────────── Latest ─────────────────────── */}
-      <section className="mx-auto max-w-7xl px-6 py-16 md:py-20">
-        <SectionHead eyebrow="Fresh" title="Latest guides" />
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          {latest.map((s) => (
-            <Link key={s.slug} href={`/article/${s.slug}`} className="group">
-              <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-ink-100">
-                <CardImage
-                  src={s.image}
-                  alt={s.title}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover zoom-target"
-                />
+            <SidebarBlock title="So far">
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <Stat value={stats.guides} label="Guides" />
+                <Stat value={stats.places} label="Places" />
+                <Stat value={stats.areas} label="Areas" />
               </div>
-              <span className="eyebrow block mt-4 text-brand-600">{s.category}</span>
-              <h3 className="mt-2 font-bold text-ink-950 text-[17px] leading-snug clamp-2 group-hover:text-brand-600 transition-colors">
-                {s.title}
-              </h3>
-              <p className="mt-2 text-sm text-ink-500 clamp-2">{s.excerpt}</p>
-              <Meta className="mt-3 text-ink-400" date={s.date} readMins={s.readMins} />
-            </Link>
-          ))}
+              <p className="mt-4 text-[13px] text-fg-muted leading-relaxed">
+                Small on purpose. Every one written, checked, and worth your time.
+              </p>
+            </SidebarBlock>
+
+            <div className="rounded-card bg-brand-500 p-5 text-ink-950">
+              <h3 className="display-sm text-[21px]">The Friday email</h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-ink-950/80">
+                New openings, what is worth doing this weekend, and the occasional
+                warning.
+              </p>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-1.5 mt-4 px-4 py-2.5 rounded-pill bg-ink-950 text-white text-[14px] font-medium hover:bg-ink-800 transition-colors"
+              >
+                Get it weekly
+                <Icon name="chevron" className="w-4 h-4" />
+              </Link>
+            </div>
+          </aside>
         </div>
       </section>
 
-      {/* ───────────────────── Newsletter ───────────────────── */}
-      <section className="mx-auto max-w-7xl px-6 pb-20">
-        <div className="relative isolate overflow-hidden rounded-3xl bg-ink-950 px-6 py-14 sm:px-14 sm:py-16">
-          <div className="absolute inset-0 bg-grid opacity-40" />
-          <div className="absolute -right-20 -top-24 w-96 h-96 rounded-full bg-brand-500/25 blur-[100px]" />
-          <div className="relative max-w-2xl">
-            <p className="eyebrow text-brand-300">Newsletter</p>
-            <h2 className="display-sm mt-3 text-white text-3xl sm:text-4xl">
-              One email a week. Only what's actually new in Gurugram.
-            </h2>
-            <p className="mt-4 text-ink-300">
-              New openings, event picks and neighbourhood guides. Unsubscribe any
-              time. We don't sell your address.
-            </p>
-            <form className="mt-8 flex flex-col sm:flex-row gap-3 max-w-lg">
-              <input
-                type="email"
-                required
-                placeholder="you@example.com"
-                aria-label="Email address"
-                className="flex-1 h-13 px-5 py-3.5 rounded-xl bg-white/10 border border-white/15 text-white placeholder:text-ink-400 focus:outline-none focus:ring-4 focus:ring-brand-500/30 focus:border-brand-500/50"
-              />
-              <button
-                type="submit"
-                className="px-7 py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold transition-colors"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
     </>
   );
 }
 
-/* ── helpers ─────────────────────────────────────────────── */
-
-/**
- * next/image throws on an empty src, and records created through the admin
- * panel may not have an image yet, fall back to a brand gradient.
- */
-function CardImage({
-  src,
-  alt,
-  sizes,
-  className = '',
-}: {
-  src: string;
-  alt: string;
-  sizes?: string;
-  className?: string;
-}) {
-  if (!src) {
-    return (
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-br from-brand-200 via-brand-50 to-ink-100"
-      />
-    );
-  }
-  return <Image src={src} alt={alt} fill sizes={sizes} className={className} />;
-}
+/* ───────────────────────── small pieces ───────────────────────── */
 
 function SectionHead({
-  eyebrow,
   title,
-  description,
-  href,
-  linkLabel,
+  blurb,
+  align = 'center',
 }: {
-  eyebrow: string;
   title: string;
-  description?: string;
-  href?: string;
-  linkLabel?: string;
+  blurb?: string;
+  align?: 'center' | 'left';
 }) {
   return (
-    <div className="flex items-end justify-between gap-6 mb-8 md:mb-10">
-      <div className="max-w-2xl">
-        <p className="eyebrow text-brand-600">{eyebrow}</p>
-        <h2 className="display-sm mt-2.5 text-ink-950 text-[1.75rem] sm:text-4xl">
-          {title}
-        </h2>
-        {description && (
-          <p className="mt-3 text-ink-500 leading-relaxed">{description}</p>
-        )}
-      </div>
-      {href && linkLabel && (
-        <Link
-          href={href}
-          className="hidden sm:inline-flex items-center gap-1.5 shrink-0 text-sm font-semibold text-ink-700 hover:text-brand-600 transition-colors"
+    <div className={`mb-6 md:mb-8 ${align === 'center' ? 'text-center' : ''}`}>
+      <h2 className="display text-fg text-[28px] md:text-[38px]">{title}</h2>
+      {blurb && (
+        <p
+          className={`mt-2.5 text-[15px] text-fg-muted ${
+            align === 'center' ? 'max-w-xl mx-auto' : 'max-w-xl'
+          }`}
         >
-          {linkLabel}
-          <Icon name="arrow" className="w-4 h-4" />
-        </Link>
+          {blurb}
+        </p>
       )}
+      <span
+        className={`block mt-4 h-[3px] w-14 rounded-full bg-brand-500 ${
+          align === 'center' ? 'mx-auto' : ''
+        }`}
+      />
     </div>
   );
 }
 
-function Meta({
-  author,
-  date,
-  readMins,
+function PhotoStory({
+  story,
+  large = false,
   className = '',
 }: {
-  author?: string;
-  date: string;
-  readMins: number;
+  story: { title: string; slug: string; image: string; category: string; date: string; excerpt: string };
+  large?: boolean;
   className?: string;
 }) {
   return (
-    <p className={`flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs ${className}`}>
-      {author && (
-        <>
-          <span className="font-semibold">{author}</span>
-          <span aria-hidden="true">·</span>
-        </>
-      )}
-      <span>{date}</span>
-      <span aria-hidden="true">·</span>
-      <span className="inline-flex items-center gap-1">
-        <Icon name="clock" className="w-3.5 h-3.5" />
-        {readMins} min read
-      </span>
-    </p>
+    <Link
+      href={`/article/${story.slug}`}
+      className={`group relative isolate block overflow-hidden rounded-card shadow-card hover:shadow-lift transition-shadow ${className}`}
+    >
+      <Image
+        src={story.image}
+        alt=""
+        fill
+        sizes={large ? '(max-width: 1024px) 100vw, 50vw' : '(max-width: 1024px) 100vw, 25vw'}
+        className="object-cover zoom-target"
+        priority={large}
+      />
+      <div className="absolute inset-0 photo-scrim" />
+      <div className="absolute inset-x-0 bottom-0 p-4 md:p-6">
+        <span className="inline-block px-2.5 py-1 rounded-pill bg-brand-500 text-ink-950 text-[11px] font-semibold">
+          {story.category}
+        </span>
+        <h3
+          className={`display-sm text-white mt-3 ${
+            large ? 'text-[24px] md:text-[34px] clamp-3' : 'text-[19px] clamp-3'
+          }`}
+        >
+          {story.title}
+        </h3>
+        {large && (
+          <p className="mt-2.5 text-[14px] text-white/80 clamp-2 max-w-xl hidden md:block">
+            {story.excerpt}
+          </p>
+        )}
+        <p className="mt-2.5 text-[12px] text-white/65">{story.date}</p>
+      </div>
+    </Link>
+  );
+}
+
+/*
+  Two states, on purpose.
+
+  With a real photograph (one that came from the database and passed the
+  provenance check) the tile is a photo card. Without one it is a designed tile
+  rather than a photo frame holding a "no image" notice: six of those on the
+  homepage read as an unfinished site, when the honest position is simply that
+  the guides are written and the photography follows.
+*/
+function AreaTile({
+  area,
+  photo,
+}: {
+  area: { name: string; slug: string; tagline: string; image: string; places: number };
+  photo: boolean;
+}) {
+  const initials = area.name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .filter(Boolean)
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+  if (!photo) {
+    /* Sized to its content rather than to a photo's 16:10 box, which otherwise
+       leaves most of the card empty. */
+    return (
+      <Link
+        href={`/area/${area.slug}`}
+        className="group relative isolate overflow-hidden rounded-card bg-card border border-line p-5 hover:border-brand-500 transition-colors"
+      >
+        <span
+          aria-hidden="true"
+          className="absolute right-3 top-1/2 -translate-y-1/2 display text-[4.5rem] leading-none text-brand-500/12 select-none"
+        >
+          {initials}
+        </span>
+        <div className="relative pr-16">
+          <h3 className="display-sm text-[20px] md:text-[23px] text-fg group-hover:text-brand-600 transition-colors">
+            {area.name}
+          </h3>
+          <p className="mt-1 text-[13px] text-fg-muted clamp-2">{area.tagline}</p>
+          <p className="mt-2.5 text-[12px] font-medium text-brand-600">
+            {area.places} {area.places === 1 ? 'place' : 'places'}
+          </p>
+        </div>
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      href={`/area/${area.slug}`}
+      className="group relative isolate overflow-hidden rounded-card aspect-[16/10] shadow-card hover:shadow-lift transition-shadow"
+    >
+      <Image
+        src={area.image}
+        alt=""
+        fill
+        sizes="(max-width: 1024px) 50vw, 33vw"
+        className="object-cover zoom-target"
+      />
+      <div className="absolute inset-0 photo-scrim" />
+      <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
+        <h3 className="display-sm text-[20px] md:text-[23px] text-white">{area.name}</h3>
+        <p className="mt-1 text-[13px] text-white/75 clamp-2">{area.tagline}</p>
+        <p className="mt-2 text-[12px] font-medium text-brand-300">
+          {area.places} {area.places === 1 ? 'place' : 'places'}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
+function SidebarBlock({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-card bg-card border border-line p-5">
+      <h3 className="display-sm text-[19px] text-fg pb-3 mb-1 border-b-2 border-brand-500 inline-block">
+        {title}
+      </h3>
+      <div className="pt-3">{children}</div>
+    </div>
+  );
+}
+
+function Stat({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="rounded-[10px] bg-card-2 py-3">
+      <p className="display text-[24px] text-brand-600 tabular-nums">{value}</p>
+      <p className="text-[11px] text-fg-subtle mt-0.5">{label}</p>
+    </div>
   );
 }

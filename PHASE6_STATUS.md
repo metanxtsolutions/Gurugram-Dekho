@@ -160,7 +160,7 @@ lib/
 ## 🌱 Database Seeding
 
 ✅ **Seed Script** (`prisma/seed.ts`)
-- Creates demo admin user (admin@gurugramdekho.com / admin123)
+- Creates demo admin user (admin@gurugramdekho.com / `SEED_ADMIN_PASSWORD` (set it before seeding; if unset the seed generates one and prints it once))
 - Creates sample categories (Food & Dining, Travel & Places)
 - Creates sample areas (Sector 29, Cyber City)
 - Creates sample places (restaurants, cafes)
@@ -207,7 +207,7 @@ npm run dev
 ### 5. Login to Admin
 - URL: http://localhost:3000/admin/dashboard
 - Email: admin@gurugramdekho.com
-- Password: admin123
+- Password: `SEED_ADMIN_PASSWORD` (set it before seeding; if unset the seed generates one and prints it once)
 
 ## 📊 What's Working
 
@@ -274,7 +274,7 @@ The following need to be built to complete admin functionality:
 1. Visit http://localhost:3000/auth/login
 2. Enter demo credentials:
    - Email: admin@gurugramdekho.com
-   - Password: admin123
+   - Password: `SEED_ADMIN_PASSWORD` (set it before seeding; if unset the seed generates one and prints it once)
 3. Redirected to /admin/dashboard
 4. Browse admin sections (all show data)
 5. Click logout to sign out

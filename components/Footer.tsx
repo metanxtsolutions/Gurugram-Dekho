@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Wordmark } from './Wordmark';
 import { Icon } from './Icons';
 
 const COLUMNS = [
@@ -10,6 +11,7 @@ const COLUMNS = [
       { label: 'Events', href: '/category/events' },
       { label: 'Shopping', href: '/category/shopping' },
       { label: 'Business & Work', href: '/category/business-work' },
+      { label: 'Tools', href: '/tools' },
     ],
   },
   {
@@ -48,18 +50,15 @@ export function Footer({
   description?: string;
 } = {}) {
   return (
-    <footer className="bg-ink-950 text-ink-300">
+    <footer className="bg-ink-950 text-fg-subtle">
       <div className="mx-auto max-w-7xl px-6 py-14 md:py-16">
         <div className="grid gap-12 lg:grid-cols-12">
           {/* Brand */}
           <div className="lg:col-span-4">
-            <Link href="/" className="inline-flex items-center gap-2.5">
-              <span className="grid place-items-center w-10 h-10 rounded-xl bg-brand-500 text-white font-extrabold text-[15px]">
-                GD
-              </span>
-              <span className="font-extrabold text-[17px] tracking-tight text-white">
-                {siteTitle}
-              </span>
+            {/* The footer band is always dark, so the mark is forced light here
+                rather than following the theme token. */}
+            <Link href="/" aria-label={siteTitle} className="inline-flex text-white">
+              <Wordmark size="md" />
             </Link>
             <p className="mt-5 text-sm leading-relaxed max-w-sm">{description}</p>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -69,7 +68,7 @@ export function Footer({
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-1.5 rounded-full border border-white/12 text-sm hover:bg-white/10 hover:text-white transition-colors"
+                  className="px-3.5 py-1.5 rounded-full border border-white/12 text-sm hover:bg-card/10 hover:text-white transition-colors"
                 >
                   {s.label}
                 </a>
@@ -99,7 +98,7 @@ export function Footer({
           <div className="lg:col-span-3">
             <h3 className="eyebrow text-white mb-4">Weekly digest</h3>
             <p className="text-sm leading-relaxed">
-              What opened, what's on, what's worth it. One email, every Friday.
+              What opened, what&apos;s on, what&apos;s worth it. One email, every Friday.
             </p>
             <form className="mt-5 space-y-2.5">
               <input
@@ -107,11 +106,11 @@ export function Footer({
                 required
                 placeholder="you@example.com"
                 aria-label="Email address"
-                className="w-full px-4 py-3 rounded-xl bg-white/8 border border-white/12 text-white text-sm placeholder:text-ink-500 focus:outline-none focus:border-brand-500/60"
+                className="w-full px-4 py-3 rounded-pill bg-white/8 border border-white/15 text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-brand-500/60"
               />
               <button
                 type="submit"
-                className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold transition-colors"
+                className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-pill bg-brand-500 hover:bg-brand-400 text-ink-950 text-sm font-semibold transition-colors"
               >
                 Subscribe
                 <Icon name="arrow" className="w-4 h-4" />
@@ -120,7 +119,7 @@ export function Footer({
           </div>
         </div>
 
-        <div className="mt-14 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-ink-500">
+        <div className="mt-14 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-fg-subtle">
           <p>© {new Date().getFullYear()} {siteTitle}. All rights reserved.</p>
           <p className="flex items-center gap-1.5">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-500" />
