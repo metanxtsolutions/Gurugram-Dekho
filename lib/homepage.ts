@@ -21,6 +21,8 @@ export type HomepageData = {
   stats: { places: number; areas: number; guides: number };
   /** True when the page is rendering curated content because the DB had nothing. */
   usingFallback: boolean;
+  /** Every published guide slug, so curated links can be checked before render. */
+  slugs: string[];
 };
 
 /**
@@ -107,7 +109,7 @@ export async function getHomepageData(): Promise<HomepageData> {
     const published = { status: 'published', isActive: true };
 
     // Featured first; whatever is short gets topped up from the latest pool.
-    const [featuredRows, recentRows, areaRows, placeRows, categoryRows, placeCount, areaCount, guideCount] =
+    const [featuredRows, recentRows, areaRows, placeRows, categoryRows, placeCount, areaCount, guideCount, slugRows] =
       await Promise.all([
         prisma.article.findMany({
           where: { ...published, featured: true },
@@ -167,6 +169,7 @@ export async function getHomepageData(): Promise<HomepageData> {
         prisma.place.count({ where: { status: 'published', isActive: true } }),
         prisma.area.count({ where: { isActive: true } }),
         prisma.article.count({ where: published }),
+        prisma.article.findMany({ where: published, select: { slug: true } }),
       ]);
 
     // Nothing published yet, show the curated set rather than an empty page.
@@ -210,6 +213,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       })),
       stats: { places: placeCount, areas: areaCount, guides: guideCount },
       usingFallback: false,
+      slugs: slugRows.map((r) => r.slug),
     };
   } catch (error) {
     // A homepage that renders is better than a 500 if the database is briefly down.
@@ -231,5 +235,6 @@ function fallback(): HomepageData {
       guides: FALLBACK_FEATURED.length + FALLBACK_LATEST.length,
     },
     usingFallback: true,
+    slugs: [...FALLBACK_FEATURED, ...FALLBACK_LATEST].map((s) => s.slug),
   };
 }

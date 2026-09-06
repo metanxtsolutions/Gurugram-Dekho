@@ -10,7 +10,15 @@ import { QUICK_SEARCHES } from '@/lib/content';
  * The homepage search. Split into its own client component so the page itself
  * stays a server component and keeps its database rendering.
  */
-export function HomeSearch({ className = '' }: { className?: string }) {
+export function HomeSearch({
+  className = '',
+  align = 'center',
+}: {
+  className?: string;
+  /** The hero is left-aligned; the search sits with it rather than centred. */
+  align?: 'center' | 'left';
+}) {
+  const centred = align === 'center';
   const router = useRouter();
   const [query, setQuery] = useState('');
 
@@ -28,7 +36,7 @@ export function HomeSearch({ className = '' }: { className?: string }) {
         instead: overlaid, it ate enough of a 390px field to clip the
         placeholder mid-word.
       */}
-      <form onSubmit={submit} className="max-w-xl mx-auto">
+      <form onSubmit={submit} className={`max-w-xl ${centred ? 'mx-auto' : ''}`}>
         <div className="relative">
           <Icon
             name="search"
@@ -51,7 +59,7 @@ export function HomeSearch({ className = '' }: { className?: string }) {
         </div>
       </form>
 
-      <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+      <div className={`mt-5 flex flex-wrap items-center gap-2 ${centred ? 'justify-center' : ''}`}>
         <span className="text-[13px] text-fg-subtle">Popular:</span>
         {QUICK_SEARCHES.slice(0, 3).map((term) => (
           <Link
