@@ -13,10 +13,13 @@ import { QUICK_SEARCHES } from '@/lib/content';
 export function HomeSearch({
   className = '',
   align = 'center',
+  onDark = false,
 }: {
   className?: string;
   /** The hero is left-aligned; the search sits with it rather than centred. */
   align?: 'center' | 'left';
+  /** On the photo hero: the field stays white, the chips go translucent. */
+  onDark?: boolean;
 }) {
   const centred = align === 'center';
   const router = useRouter();
@@ -48,7 +51,11 @@ export function HomeSearch({
             type="search"
             placeholder="Try “rooftop in Sector 29”"
             aria-label="Search Gurugram Dekho"
-            className="w-full h-14 pl-13 pr-5 sm:pr-32 rounded-pill bg-card border border-line text-[15px] text-fg placeholder:text-fg-subtle shadow-card focus:outline-none focus:border-brand-500 transition-colors"
+            className={`w-full h-14 pl-13 pr-5 sm:pr-32 rounded-pill text-[15px] shadow-card focus:outline-none focus:border-brand-500 transition-colors ${
+              onDark
+                ? 'bg-white border-white text-ink-950 placeholder:text-ink-500'
+                : 'bg-card border border-line text-fg placeholder:text-fg-subtle'
+            }`}
           />
           <button
             type="submit"
@@ -60,12 +67,16 @@ export function HomeSearch({
       </form>
 
       <div className={`mt-5 flex flex-wrap items-center gap-2 ${centred ? 'justify-center' : ''}`}>
-        <span className="text-[13px] text-fg-subtle">Popular:</span>
+        <span className={`text-[13px] ${onDark ? 'text-white/70' : 'text-fg-subtle'}`}>Popular:</span>
         {QUICK_SEARCHES.slice(0, 3).map((term) => (
           <Link
             key={term}
             href={`/search?q=${encodeURIComponent(term)}`}
-            className="px-3.5 py-1.5 rounded-pill bg-card-2 border border-line text-[13px] font-medium text-fg-muted hover:text-fg hover:border-brand-500 transition-colors"
+            className={`px-3.5 py-1.5 rounded-pill border text-[13px] font-medium transition-colors ${
+              onDark
+                ? 'bg-white/12 border-white/25 text-white hover:bg-brand-500 hover:border-brand-500 hover:text-ink-950'
+                : 'bg-card-2 border-line text-fg-muted hover:text-fg hover:border-brand-500'
+            }`}
           >
             {term}
           </Link>
