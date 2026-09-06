@@ -29,12 +29,25 @@ const TOOLS = [
     blurb: 'Type a sector number or an area name. Get where it is, the nearest metro, what it is like, and what we have written about it.',
     verified: 'August 2026',
   },
+  {
+    href: '/tools/pg-checklist',
+    icon: 'book',
+    name: 'PG safety checklist',
+    blurb: 'Sixteen things to check at a viewing, what each protects you from, and the question to ask. Ticks stay on your phone.',
+    verified: 'August 2026',
+  },
+  {
+    href: '/tools/commute',
+    icon: 'navigation',
+    name: 'Commute comparison',
+    blurb: 'Metro, cab or auto between two places, at peak, off-peak or late at night. Time, cost, and whether it is even an option.',
+    verified: 'August 2026',
+  },
 ] as const;
 
 const COMING = [
-  { name: 'PG safety checklist', when: 'next' },
-  { name: 'Commute comparison: metro vs cab vs auto', when: 'next' },
-  { name: 'Open now filter', when: 'soon' },
+  { name: 'Open now filter', when: 'next' },
+  { name: 'Weekend picker: hours, budget, with or without a car', when: 'soon' },
 ];
 
 export default function ToolsPage() {

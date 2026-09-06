@@ -35,6 +35,7 @@ const PATHS: { title: string; blurb: string; items: { slug?: string; href?: stri
       { href: '/tools/sector-decoder', label: 'Decode the sector in the listing' },
       { slug: 'moving-to-gurugram-rental-guide', label: 'Read this before you sign a lease' },
       { href: '/tools/move-in-cost', label: 'Work out the cash you need on day one' },
+      { href: '/tools/commute', label: 'Test the commute before you commit' },
       { slug: 'rapid-metro-gurugram-explained', label: 'The Rapid Metro, explained' },
     ],
   },

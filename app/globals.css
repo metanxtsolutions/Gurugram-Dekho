@@ -248,6 +248,16 @@ body {
   }
 }
 
+/* The PG checklist prints as a plain list: chrome, sidebar and buttons drop
+   out, the ticks and the questions stay. */
+@media print {
+  header, footer, aside, nav, .no-print { display: none !important; }
+  body { background: #fff; color: #000; }
+  main { padding: 0; }
+  .rounded-card { border-color: #bbb !important; box-shadow: none !important; break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+}
+
 ::selection {
   background: var(--color-brand-500);
   color: #060c22;
