@@ -43,7 +43,9 @@ const PATHS: { title: string; blurb: string; items: { slug?: string; href?: stri
     title: 'First weekend',
     blurb: 'Where people go once, and where they go back.',
     items: [
+      { href: '/tools/weekend', label: 'Pick something to do this weekend' },
       { slug: 'sector-29-food-guide-gurugram', label: 'The Sector 29 food guide' },
+      { href: '/tools/open-now', label: 'See what is open right now' },
       { slug: 'cyber-hub-vs-cyber-city-2026', label: 'Cyber Hub vs Cyber City' },
       { slug: 'budget-eats-under-300-old-gurgaon', label: 'Budget eats across Old Gurgaon' },
       { slug: 'weekend-escapes-near-gurugram', label: 'Weekend escapes within 90 minutes' },

@@ -43,12 +43,21 @@ const TOOLS = [
     blurb: 'Metro, cab or auto between two places, at peak, off-peak or late at night. Time, cost, and whether it is even an option.',
     verified: 'August 2026',
   },
+  {
+    href: '/tools/open-now',
+    icon: 'clock',
+    name: 'What is open right now',
+    blurb: 'Every place we list that is open at this moment, soonest to close first, in Gurugram time.',
+    verified: 'August 2026',
+  },
+  {
+    href: '/tools/weekend',
+    icon: 'sparkles',
+    name: 'Weekend picker',
+    blurb: 'How long you have, what you want to spend, car or no car. Three things worth doing.',
+    verified: 'August 2026',
+  },
 ] as const;
-
-const COMING = [
-  { name: 'Open now filter', when: 'next' },
-  { name: 'Weekend picker: hours, budget, with or without a car', when: 'soon' },
-];
 
 export default function ToolsPage() {
   return (
@@ -85,20 +94,9 @@ export default function ToolsPage() {
           ))}
         </div>
 
-        <div className="mt-10 max-w-2xl">
-          <p className="eyebrow text-fg-subtle">Being built</p>
-          <ul className="mt-2 divide-y divide-line">
-            {COMING.map((c) => (
-              <li key={c.name} className="flex items-center justify-between gap-4 py-3 text-[15px]">
-                <span className="text-fg">{c.name}</span>
-                <span className="px-2.5 py-1 rounded-pill bg-card-2 border border-line text-[12px] text-fg-muted">{c.when}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-[14px] text-fg-muted">
-            Want one that is not here? <Link href="/contact" className="text-brand-600 hover:text-brand-700">Tell us what you are trying to work out.</Link>
-          </p>
-        </div>
+        <p className="mt-10 max-w-2xl text-[14px] text-fg-muted">
+          Want one that is not here? <Link href="/contact" className="text-brand-600 hover:text-brand-700">Tell us what you are trying to work out.</Link>
+        </p>
       </div>
     </>
   );

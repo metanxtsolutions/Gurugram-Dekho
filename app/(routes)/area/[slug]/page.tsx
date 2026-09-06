@@ -13,7 +13,7 @@ import { getOpenState } from '@/lib/opening-hours';
 
 interface AreaPageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ type?: string }>;
+  searchParams: Promise<{ type?: string; open?: string }>;
 }
 
 async function getArea(slug: string) {
@@ -40,12 +40,13 @@ export async function generateMetadata({ params }: AreaPageProps): Promise<Metad
 
 export default async function AreaPage({ params, searchParams }: AreaPageProps) {
   const { slug } = await params;
-  const { type } = await searchParams;
+  const { type, open } = await searchParams;
+  const openOnly = open === '1';
 
   const area = await getArea(slug);
   if (!area) notFound();
 
-  const [places, allTypes, nearby, guides, topRated] = await Promise.all([
+  const [fetchedPlaces, allTypes, nearby, guides, topRated] = await Promise.all([
     prisma.place.findMany({
       where: { areaId: area.id, status: 'published', ...(type ? { placeType: type } : {}) },
       include: { area: true, image: true, openingHours: true },
@@ -88,6 +89,17 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
   ]);
 
   const totalPlaces = allTypes.reduce((sum, t) => sum + t._count.placeType, 0);
+  /*
+    "Open now" is decided here rather than in the query, because opening hours
+    that run past midnight need the same logic the place page uses.
+  */
+  const places = openOnly
+    ? fetchedPlaces.filter((p) => {
+        const st = getOpenState(p.openingHours, p.alwaysOpen).status;
+        return st === 'open' || st === 'always';
+      })
+    : fetchedPlaces;
+
   const priceCounts = places.reduce<Record<string, number>>((acc, p) => {
     acc[p.priceRange] = (acc[p.priceRange] ?? 0) + 1;
     return acc;
@@ -166,15 +178,21 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
               </div>
             </div>
 
-            {allTypes.length > 1 && (
+            {(allTypes.length > 1 || fetchedPlaces.length > 0) && (
               <div className="flex flex-wrap gap-2 mb-8">
-                <FilterChip href={`/area/${area.slug}`} active={!type}>
+                <FilterChip
+                  href={`/area/${area.slug}${type ? `?type=${encodeURIComponent(type)}` : ''}${openOnly ? '' : type ? '&open=1' : '?open=1'}`}
+                  active={openOnly}
+                >
+                  Open now
+                </FilterChip>
+                <FilterChip href={`/area/${area.slug}${openOnly ? '?open=1' : ''}`} active={!type}>
                   All <span className="text-xs opacity-60">{totalPlaces}</span>
                 </FilterChip>
                 {allTypes.map((t) => (
                   <FilterChip
                     key={t.placeType}
-                    href={`/area/${area.slug}?type=${encodeURIComponent(t.placeType)}`}
+                    href={`/area/${area.slug}?type=${encodeURIComponent(t.placeType)}${openOnly ? '&open=1' : ''}`}
                     active={type === t.placeType}
                   >
                     {t.placeType} <span className="text-xs opacity-60">{t._count.placeType}</span>
@@ -186,7 +204,7 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
             {places.length === 0 ? (
               <div className="rounded-card border border-dashed border-line bg-card-2 px-8 py-16 text-center">
                 <h3 className="display-sm text-fg text-xl">
-                  {type ? `No ${type} listings here yet` : 'No places listed yet'}
+                  {openOnly ? 'Nothing here is open right now' : type ? `No ${type} listings here yet` : 'No places listed yet'}
                 </h3>
                 <p className="mt-2 text-fg-subtle">
                   We&apos;re still mapping {area.name}. Check back soon.
@@ -280,7 +298,7 @@ export default async function AreaPage({ params, searchParams }: AreaPageProps) 
                   {allTypes.map((t) => (
                     <li key={t.placeType}>
                       <Link
-                        href={`/area/${area.slug}?type=${encodeURIComponent(t.placeType)}`}
+                        href={`/area/${area.slug}?type=${encodeURIComponent(t.placeType)}${openOnly ? '&open=1' : ''}`}
                         className="flex items-center justify-between gap-3 py-2.5 text-[15px] font-medium text-fg-muted hover:text-brand-600 transition-colors"
                       >
                         <span className="capitalize truncate">{t.placeType}</span>
